@@ -1,6 +1,6 @@
 import bookletService from "../services/booklet.service.js";
 
-export const createBooklet = async (req, res) => {
+export const createBookletQuote = async (req, res) => {
   try {
     const data = req.body;
 
@@ -12,15 +12,32 @@ export const createBooklet = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Booklet created successfully",
+      message: "Booklet quote created successfully",
       data: booklet
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error creating booklet",
+      message: "Error creating booklet quote",
       error: error.message
+    });
+  }
+};
+
+export const getAllQuotes = async (req, res) => {
+  try {
+    const booklets = await bookletService.getAllBooklets();
+
+    res.status(200).json({
+      success: true,
+      data: booklets
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching quotes"
     });
   }
 };
@@ -49,7 +66,7 @@ export const getBookletById = async (req, res) => {
     if (!booklet) {
       return res.status(404).json({
         success: false,
-        message: "Booklet not found"
+        message: "Booklet quote not found"
       });
     }
 
@@ -61,7 +78,7 @@ export const getBookletById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching booklet"
+      message: "Error fetching booklet quote"
     });
   }
 };
@@ -72,20 +89,20 @@ export const deleteBooklet = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Booklet deleted successfully"
+      message: "Booklet quote deleted successfully"
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting booklet"
+      message: "Error deleting booklet quote"
     });
   }
 };
 
 export default {
-  createBooklet,
-  getAllBooklets,
+  createBookletQuote,
+  getAllQuotes,
   getBookletById,
   deleteBooklet
 };
