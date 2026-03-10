@@ -18,9 +18,8 @@ export const getAllOptions = async (req, res) => {
   }
 };
 
-export const addOptionValue = async (req, res) => {
+export const addOptionValue = async (req, res, category) => {
   try {
-    const category = req.route.path.split("/")[1];
     const { value } = req.body;
 
     if (!value) {
@@ -46,9 +45,8 @@ export const addOptionValue = async (req, res) => {
   }
 };
 
-export const updateOptionValue = async (req, res) => {
+export const updateOptionValue = async (req, res, category) => {
   try {
-    const category = req.route.path.split("/")[1];
     const { index } = req.params;
     const { value } = req.body;
 
@@ -75,9 +73,8 @@ export const updateOptionValue = async (req, res) => {
   }
 };
 
-export const deleteOptionValue = async (req, res) => {
+export const deleteOptionValue = async (req, res, category) => {
   try {
-    const category = req.route.path.split("/")[1];
     const { index } = req.params;
 
     const options = await optionsService.deleteOptionValue(category, parseInt(index));
