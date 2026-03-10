@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import connectDB from "./src/config/db.js";
-import bookletQuoteRoutes from "./src/routes/bookletQuote.routes.js";
+import bookletQuoteRoutes from "./src/routes/booklet.routes.js";
 import errorHandler from "./src/middleware/error.middleware.js";
 
 dotenv.config();
@@ -16,7 +16,6 @@ app.use(express.json());
 connectDB();
 
 app.use("/api/booklet-quote", bookletQuoteRoutes);
-app.use("/api/booklet-options", bookletQuoteRoutes);
 
 app.use(errorHandler);
 
