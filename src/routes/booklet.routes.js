@@ -31,12 +31,17 @@ router.post("/page-edges", (req, res) => optionsController.addOptionValue(req, r
 router.post("/packaging", (req, res) => optionsController.addOptionValue(req, res, "packaging"));
 router.post("/special-finishing", (req, res) => optionsController.addOptionValue(req, res, "specialFinishing"));
 
+
+
 /* PUT APIs - Update Option Values */
 router.put("/book-sizes/:index", (req, res) => optionsController.updateOptionValue(req, res, "bookSizes"));
 router.put("/binding-types/:index", (req, res) => optionsController.updateOptionValue(req, res, "bindingTypes"));
 router.put("/paper-types/:index", (req, res) => optionsController.updateOptionValue(req, res, "paperTypes"));
 router.put("/cover-finishes/:index", (req, res) => optionsController.updateOptionValue(req, res, "coverFinishes"));
 router.put("/page-edges/:index", (req, res) => optionsController.updateOptionValue(req, res, "pageEdges"));
+
+
+
 
 /* DELETE APIs - Delete Option Values */
 router.delete("/book-sizes/:index", (req, res) => optionsController.deleteOptionValue(req, res, "bookSizes"));
