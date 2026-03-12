@@ -6,6 +6,11 @@ import multer from "multer";
 import connectDB from "./src/config/db.js";
 import bookletQuoteRoutes from "./src/routes/booklet.routes.js";
 import errorHandler from "./src/middleware/error.middleware.js";
+import notebookRoutes from "./src/routes/notebook.routes.js";
+import ledgerRegisterRoutes from "./src/routes/ledgerRegister.routes.js";
+import letterheadRoutes from "./src/routes/letterhead.routes.js";
+import shoppingBagsRoutes from "./src/routes/shoppingBags.routes.js";
+
 
 dotenv.config();
 
@@ -29,6 +34,20 @@ app.use(express.json());
 // Apply upload middleware to booklet quote routes
 app.use("/api/booklet-quote", upload.array("files", 10), bookletQuoteRoutes);
 
+app.use("/api/notebook-quote", upload.array("files", 10), notebookRoutes);
+
+app.use(
+"/api/ledger-register",
+upload.array("files",10),
+ledgerRegisterRoutes
+);
+
+app.use(
+"/api/letterhead",
+upload.array("files",10),
+letterheadRoutes
+);
+app.use("/api/shopping-bags", upload.array("files", 10), shoppingBagsRoutes);
 connectDB();
 
 app.use(errorHandler);
