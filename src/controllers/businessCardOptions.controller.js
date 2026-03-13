@@ -1,8 +1,8 @@
-import optionsService from "../services/options.service.js";
+import businessCardOptionsService from "../services/businessCardOptions.service.js";
 
-export const getAllOptions = async (req, res) => {
+export const getAllBusinessCardOptions = async (req, res) => {
   try {
-    const options = await optionsService.getAllOptions();
+    const options = await businessCardOptionsService.getAllBusinessCardOptions();
 
     res.status(200).json({
       success: true,
@@ -12,13 +12,13 @@ export const getAllOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching options",
+      message: "Error fetching business card options",
       error: error.message
     });
   }
 };
 
-export const addOptionValue = async (req, res, category) => {
+export const addBusinessCardOptionValue = async (req, res, category) => {
   try {
     const { value } = req.body;
 
@@ -29,7 +29,7 @@ export const addOptionValue = async (req, res, category) => {
       });
     }
 
-    const options = await optionsService.addOptionValue(category, value);
+    const options = await businessCardOptionsService.addBusinessCardOptionValue(category, value);
 
     res.status(201).json({
       success: true,
@@ -45,7 +45,7 @@ export const addOptionValue = async (req, res, category) => {
   }
 };
 
-export const updateOptionValue = async (req, res, category) => {
+export const updateBusinessCardOptionValue = async (req, res, category) => {
   try {
     const { index } = req.params;
     const { value } = req.body;
@@ -57,7 +57,7 @@ export const updateOptionValue = async (req, res, category) => {
       });
     }
 
-    const options = await optionsService.updateOptionValue(category, parseInt(index), value);
+    const options = await businessCardOptionsService.updateBusinessCardOptionValue(category, parseInt(index), value);
 
     res.status(200).json({
       success: true,
@@ -73,11 +73,11 @@ export const updateOptionValue = async (req, res, category) => {
   }
 };
 
-export const deleteOptionValue = async (req, res, category) => {
+export const deleteBusinessCardOptionValue = async (req, res, category) => {
   try {
     const { index } = req.params;
 
-    const options = await optionsService.deleteOptionValue(category, parseInt(index));
+    const options = await businessCardOptionsService.deleteBusinessCardOptionValue(category, parseInt(index));
 
     res.status(200).json({
       success: true,
@@ -94,8 +94,8 @@ export const deleteOptionValue = async (req, res, category) => {
 };
 
 export default {
-  getAllOptions,
-  addOptionValue,
-  updateOptionValue,
-  deleteOptionValue
+  getAllBusinessCardOptions,
+  addBusinessCardOptionValue,
+  updateBusinessCardOptionValue,
+  deleteBusinessCardOptionValue
 };
