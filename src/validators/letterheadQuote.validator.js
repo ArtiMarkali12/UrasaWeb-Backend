@@ -19,7 +19,7 @@ export default function validateLetterheadQuote(req,res,next){
   if(!customerDetails){
     return res.status(400).json({
       success:false,
-      message:"Customer details required"
+      message:"Customer details is required"
     });
   }
 
