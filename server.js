@@ -10,7 +10,7 @@ import notebookRoutes from "./src/routes/notebook.routes.js";
 import ledgerRegisterRoutes from "./src/routes/ledgerRegister.routes.js";
 import letterheadRoutes from "./src/routes/letterhead.routes.js";
 import shoppingBagsRoutes from "./src/routes/shoppingBags.routes.js";
-
+import adminRoutes from "./src/routes/admin.routes.js";
 
 dotenv.config();
 
@@ -48,6 +48,10 @@ upload.array("files",10),
 letterheadRoutes
 );
 app.use("/api/shopping-bags", upload.array("files", 10), shoppingBagsRoutes);
+
+// Admin routes
+app.use("/api/admin", adminRoutes);
+
 connectDB();
 
 app.use(errorHandler);
