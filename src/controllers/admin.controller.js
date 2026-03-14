@@ -18,7 +18,7 @@ export const registerAdmin = async (req, res) => {
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
-        message: "Admin with this email already exists"
+        message: "Admin with this email is already exists"
       });
     }
 
