@@ -17,9 +17,17 @@ export const deleteBooklet = async (id) => {
   return await Booklet.findByIdAndDelete(id);
 };
 
+export const updateBooklet = async (id, data) => {
+  return await Booklet.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+};
+
 export default {
   createBooklet,
   getAllBooklets,
   getBookletById,
-  deleteBooklet
+  deleteBooklet,
+  updateBooklet,
 };

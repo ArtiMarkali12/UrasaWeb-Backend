@@ -6,14 +6,13 @@ export const getAllOptions = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: options
+      data: options,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error fetching options",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -25,7 +24,7 @@ export const addOptionValue = async (req, res, category) => {
     if (!value) {
       return res.status(400).json({
         success: false,
-        message: "Value is required"
+        message: "Value is required",
       });
     }
 
@@ -34,13 +33,12 @@ export const addOptionValue = async (req, res, category) => {
     res.status(201).json({
       success: true,
       message: `${category} option added successfully`,
-      data: options
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -53,22 +51,25 @@ export const updateOptionValue = async (req, res, category) => {
     if (!value) {
       return res.status(400).json({
         success: false,
-        message: "Value is required"
+        message: "Value is required",
       });
     }
 
-    const options = await optionsService.updateOptionValue(category, parseInt(index), value);
+    const options = await optionsService.updateOptionValue(
+      category,
+      parseInt(index),
+      value,
+    );
 
     res.status(200).json({
       success: true,
       message: `${category} option updated successfully`,
-      data: options
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -77,18 +78,72 @@ export const deleteOptionValue = async (req, res, category) => {
   try {
     const { index } = req.params;
 
-    const options = await optionsService.deleteOptionValue(category, parseInt(index));
+    const options = await optionsService.deleteOptionValue(
+      category,
+      parseInt(index),
+    );
 
     res.status(200).json({
       success: true,
       message: `${category} option deleted successfully`,
-      data: options
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
+    });
+  }
+};
+
+export const addCategory = async (req, res) => {
+  try {
+    const { categoryName, displayName } = req.body;
+
+    if (!categoryName) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required",
+      });
+    }
+
+    const options = await optionsService.addCategory(categoryName);
+
+    res.status(201).json({
+      success: true,
+      message: `Category "${categoryName}" added successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { categoryName } = req.body;
+
+    if (!categoryName) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name is required",
+      });
+    }
+
+    const options = await optionsService.deleteCategory(categoryName);
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryName}" deleted successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
   }
 };
@@ -97,5 +152,7 @@ export default {
   getAllOptions,
   addOptionValue,
   updateOptionValue,
-  deleteOptionValue
+  deleteOptionValue,
+  addCategory,
+  deleteCategory,
 };

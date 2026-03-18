@@ -1,84 +1,39 @@
 import Options from "../models/options.model.js";
 
 export const getAllOptions = async () => {
-  let options = await Options.findOne();
-
-  if (!options) {
-    options = await Options.create({
-      bookSizes: [],
-      bindingTypes: [],
-      coverStyles: [],
-      printColors: [],
-      paperWeights: [],
-      paperTypes: [],
-      coverFinishes: [],
-      pageEdges: [],
-      packaging: [],
-      specialFinishing: []
-    });
-  }
-
-  return options;
+  return await Options.getAllOptions();
 };
 
 export const addOptionValue = async (category, value) => {
-  const options = await getAllOptions();
-  
-  if (!options[category]) {
-    throw new Error(`Invalid category: ${category}`);
-  }
-
-  if (options[category].includes(value)) {
-    throw new Error(`Value already exists in ${category}`);
-  }
-
-  options[category].push(value);
-  await options.save();
-
-  return options;
+  return await Options.addOptionValue(category, value);
 };
 
 export const updateOptionValue = async (category, index, newValue) => {
-  const options = await getAllOptions();
-  
-  if (!options[category]) {
-    throw new Error(`Invalid category: ${category}`);
-  }
-
-  if (index < 0 || index >= options[category].length) {
-    throw new Error(`Invalid index: ${index}`);
-  }
-
-  if (options[category].includes(newValue) && options[category][index] !== newValue) {
-    throw new Error(`Value already exists in ${category}`);
-  }
-
-  options[category][index] = newValue;
-  await options.save();
-
-  return options;
+  return await Options.updateOptionValue(category, index, newValue);
 };
 
 export const deleteOptionValue = async (category, index) => {
-  const options = await getAllOptions();
-  
-  if (!options[category]) {
-    throw new Error(`Invalid category: ${category}`);
+  return await Options.deleteOptionValue(category, index);
+};
+
+export const addCategory = async (categoryName) => {
+  // No validation - allow any characters
+  if (!categoryName || !categoryName.trim()) {
+    throw new Error("Category name is required");
   }
 
-  if (index < 0 || index >= options[category].length) {
-    throw new Error(`Invalid index: ${index}`);
-  }
+  return await Options.addCategory(categoryName.trim());
+};
 
-  options[category].splice(index, 1);
-  await options.save();
-
-  return options;
+export const deleteCategory = async (categoryName) => {
+  return await Options.deleteCategory(categoryName);
 };
 
 export default {
   getAllOptions,
   addOptionValue,
   updateOptionValue,
-  deleteOptionValue
+  deleteOptionValue,
+  addCategory,
+  deleteCategory,
 };

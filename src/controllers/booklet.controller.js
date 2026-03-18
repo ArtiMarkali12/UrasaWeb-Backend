@@ -5,7 +5,7 @@ export const createBookletQuote = async (req, res) => {
     const data = req.body;
 
     if (req.files) {
-      data.files = req.files.map(file => file.path);
+      data.files = req.files.map((file) => file.path);
     }
 
     const booklet = await bookletService.createBooklet(data);
@@ -13,14 +13,13 @@ export const createBookletQuote = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Booklet quote created successfully",
-      data: booklet
+      data: booklet,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error creating booklet quote",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -31,13 +30,12 @@ export const getAllQuotes = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: booklets
+      data: booklets,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching quotes"
+      message: "Error fetching quotes",
     });
   }
 };
@@ -48,13 +46,12 @@ export const getAllBooklets = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: booklets
+      data: booklets,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching booklets"
+      message: "Error fetching booklets",
     });
   }
 };
@@ -66,19 +63,18 @@ export const getBookletById = async (req, res) => {
     if (!booklet) {
       return res.status(404).json({
         success: false,
-        message: "Booklet quote not found"
+        message: "Booklet quote not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: booklet
+      data: booklet,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching booklet quote"
+      message: "Error fetching booklet quote",
     });
   }
 };
@@ -89,13 +85,43 @@ export const deleteBooklet = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Booklet quote deleted successfully"
+      message: "Booklet quote deleted successfully",
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting booklet quote"
+      message: "Error deleting booklet quote",
+    });
+  }
+};
+
+export const updateBooklet = async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (req.files && req.files.length > 0) {
+      data.files = req.files.map((file) => file.path);
+    }
+
+    const booklet = await bookletService.updateBooklet(req.params.id, data);
+
+    if (!booklet) {
+      return res.status(404).json({
+        success: false,
+        message: "Booklet quote not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Booklet quote updated successfully",
+      data: booklet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating booklet quote",
+      error: error.message,
     });
   }
 };
@@ -104,5 +130,6 @@ export default {
   createBookletQuote,
   getAllQuotes,
   getBookletById,
-  deleteBooklet
+  deleteBooklet,
+  updateBooklet,
 };
