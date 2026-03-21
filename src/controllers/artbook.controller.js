@@ -12,7 +12,7 @@ export const createArtbook = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Artbook created successfully",
+      message: "Artbook is created successfully",
       data: artbook
     });
 
