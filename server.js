@@ -6,6 +6,7 @@ import multer from "multer";
 import connectDB from "./src/config/db.js";
 
 import bookletQuoteRoutes from "./src/routes/booklet.routes.js";
+import bookletOptionsRoutes from "./src/routes/bookletOptions.routes.js";
 import artbookRoutes from "./src/routes/artbook.routes.js";
 import businessCardRoutes from "./src/routes/businessCard.routes.js";
 import customEnvelopeRoutes from "./src/routes/customEnvelope.routes.js";
@@ -51,19 +52,18 @@ app.use(express.json());
 
 app.use("/api/booklet-quote", upload.array("files", 10), bookletQuoteRoutes);
 
+/* Booklet Options (No upload) */
+app.use("/api/booklet-options", bookletOptionsRoutes);
+
 app.use("/api/notebook-quote", upload.array("files", 10), notebookRoutes);
 
 app.use(
   "/api/ledger-register",
   upload.array("files", 10),
-  ledgerRegisterRoutes
+  ledgerRegisterRoutes,
 );
 
-app.use(
-  "/api/letterhead",
-  upload.array("files", 10),
-  letterheadRoutes
-);
+app.use("/api/letterhead", upload.array("files", 10), letterheadRoutes);
 
 app.use("/api/shopping-bags", upload.array("files", 10), shoppingBagsRoutes);
 
@@ -74,7 +74,7 @@ app.use("/api/business-card", upload.array("files", 10), businessCardRoutes);
 app.use(
   "/api/custom-envelope",
   upload.array("files", 10),
-  customEnvelopeRoutes
+  customEnvelopeRoutes,
 );
 
 app.use("/api/custom-card", upload.array("files", 10), customCardRoutes);
@@ -91,7 +91,7 @@ app.use("/api/pamphlet", upload.array("files", 10), pamphletRoutes);
 app.use(
   "/api/product-catalogue",
   upload.array("files", 10),
-  productCatalogueRoutes
+  productCatalogueRoutes,
 );
 
 /* Admin routes */

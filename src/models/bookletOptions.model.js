@@ -1,22 +1,23 @@
 import mongoose from "mongoose";
 
-// Schema for attribute values
-const attributeValueSchema = new mongoose.Schema(
+// Schema for subcategories containing attributes
+const subcategorySchema = new mongoose.Schema(
   {
-    value: {
-      type: String,
-      required: true,
+    attributes: {
+      type: [String],
+      default: [],
     },
   },
   { _id: false },
 );
 
-// Schema for subcategories containing attributes
-const subcategorySchema = new mongoose.Schema(
+// Schema for main categories containing subcategories and direct attributes
+const categorySchema = new mongoose.Schema(
   {
-    displayName: {
-      type: String,
-      required: true,
+    subcategories: {
+      type: Map,
+      of: subcategorySchema,
+      default: new Map(),
     },
     attributes: {
       type: [String],
@@ -26,23 +27,7 @@ const subcategorySchema = new mongoose.Schema(
   { _id: false },
 );
 
-// Schema for main categories containing subcategories
-const categorySchema = new mongoose.Schema(
-  {
-    displayName: {
-      type: String,
-      required: true,
-    },
-    subcategories: {
-      type: Map,
-      of: subcategorySchema,
-      default: new Map(),
-    },
-  },
-  { _id: false },
-);
-
-const optionsSchema = new mongoose.Schema(
+const bookletOptionSchema = new mongoose.Schema(
   {
     // Hierarchical categories structure
     categories: {
@@ -55,7 +40,7 @@ const optionsSchema = new mongoose.Schema(
 );
 
 // Static method to get all options as hierarchical object
-optionsSchema.statics.getAllOptions = async function () {
+bookletOptionSchema.statics.getAllOptions = async function () {
   let options = await this.findOne();
 
   if (!options) {
@@ -69,14 +54,13 @@ optionsSchema.statics.getAllOptions = async function () {
   if (options.categories) {
     options.categories.forEach((categoryData, categoryKey) => {
       result[categoryKey] = {
-        displayName: categoryData.displayName,
+        attributes: categoryData.attributes || [],
         subcategories: {},
       };
 
       if (categoryData.subcategories) {
         categoryData.subcategories.forEach((subcatData, subcatKey) => {
           result[categoryKey].subcategories[subcatKey] = {
-            displayName: subcatData.displayName,
             attributes: subcatData.attributes || [],
           };
         });
@@ -88,14 +72,12 @@ optionsSchema.statics.getAllOptions = async function () {
 };
 
 // Static method to add a new main category
-optionsSchema.statics.addCategory = async function (categoryKey, displayName) {
+bookletOptionSchema.statics.addCategory = async function (categoryKey) {
   let options = await this.findOne();
 
   if (!options) {
     options = await this.create({
-      categories: new Map([
-        [categoryKey, { displayName, subcategories: new Map() }],
-      ]),
+      categories: new Map([[categoryKey, { subcategories: new Map() }]]),
     });
   } else {
     if (!options.categories) {
@@ -107,7 +89,6 @@ optionsSchema.statics.addCategory = async function (categoryKey, displayName) {
     }
 
     options.categories.set(categoryKey, {
-      displayName,
       subcategories: new Map(),
     });
     options.markModified("categories");
@@ -118,10 +99,9 @@ optionsSchema.statics.addCategory = async function (categoryKey, displayName) {
 };
 
 // Static method to add a subcategory under a category
-optionsSchema.statics.addSubcategory = async function (
+bookletOptionSchema.statics.addSubcategory = async function (
   categoryKey,
   subcategoryKey,
-  displayName,
 ) {
   let options = await this.findOne();
 
@@ -144,7 +124,7 @@ optionsSchema.statics.addSubcategory = async function (
     );
   }
 
-  category.subcategories.set(subcategoryKey, { displayName, attributes: [] });
+  category.subcategories.set(subcategoryKey, { attributes: [] });
   options.categories.set(categoryKey, category);
   options.markModified("categories");
   await options.save();
@@ -153,7 +133,7 @@ optionsSchema.statics.addSubcategory = async function (
 };
 
 // Static method to delete a category
-optionsSchema.statics.deleteCategory = async function (categoryKey) {
+bookletOptionSchema.statics.deleteCategory = async function (categoryKey) {
   let options = await this.findOne();
 
   if (!options) {
@@ -171,7 +151,7 @@ optionsSchema.statics.deleteCategory = async function (categoryKey) {
 };
 
 // Static method to delete a subcategory
-optionsSchema.statics.deleteSubcategory = async function (
+bookletOptionSchema.statics.deleteSubcategory = async function (
   categoryKey,
   subcategoryKey,
 ) {
@@ -198,7 +178,7 @@ optionsSchema.statics.deleteSubcategory = async function (
 };
 
 // Static method to add an attribute to a subcategory
-optionsSchema.statics.addAttribute = async function (
+bookletOptionSchema.statics.addAttribute = async function (
   categoryKey,
   subcategoryKey,
   value,
@@ -239,7 +219,7 @@ optionsSchema.statics.addAttribute = async function (
 };
 
 // Static method to update an attribute value
-optionsSchema.statics.updateAttribute = async function (
+bookletOptionSchema.statics.updateAttribute = async function (
   categoryKey,
   subcategoryKey,
   index,
@@ -286,7 +266,7 @@ optionsSchema.statics.updateAttribute = async function (
 };
 
 // Static method to delete an attribute
-optionsSchema.statics.deleteAttribute = async function (
+bookletOptionSchema.statics.deleteAttribute = async function (
   categoryKey,
   subcategoryKey,
   index,
@@ -324,10 +304,10 @@ optionsSchema.statics.deleteAttribute = async function (
   return options;
 };
 
-// Static method to delete a subcategory
-optionsSchema.statics.deleteSubcategory = async function (
+// Static method to add an attribute directly to a category
+bookletOptionSchema.statics.addCategoryAttribute = async function (
   categoryKey,
-  subcategoryKey,
+  value,
 ) {
   let options = await this.findOne();
 
@@ -340,11 +320,15 @@ optionsSchema.statics.deleteSubcategory = async function (
   }
 
   const category = options.categories.get(categoryKey);
-  if (!category.subcategories || !category.subcategories.has(subcategoryKey)) {
-    throw new Error(`Subcategory "${subcategoryKey}" does not exist`);
+  if (!category.attributes) {
+    category.attributes = [];
   }
 
-  category.subcategories.delete(subcategoryKey);
+  if (category.attributes.includes(value)) {
+    throw new Error(`Value "${value}" already exists in "${categoryKey}"`);
+  }
+
+  category.attributes.push(value);
   options.categories.set(categoryKey, category);
   options.markModified("categories");
   await options.save();
@@ -352,4 +336,76 @@ optionsSchema.statics.deleteSubcategory = async function (
   return options;
 };
 
-export default mongoose.model("Options", optionsSchema);
+// Static method to update a category-level attribute
+bookletOptionSchema.statics.updateCategoryAttribute = async function (
+  categoryKey,
+  index,
+  newValue,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+  if (
+    !category.attributes ||
+    index < 0 ||
+    index >= category.attributes.length
+  ) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  if (
+    category.attributes.includes(newValue) &&
+    category.attributes[index] !== newValue
+  ) {
+    throw new Error(`Value already exists`);
+  }
+
+  category.attributes[index] = newValue;
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
+// Static method to delete a category-level attribute
+bookletOptionSchema.statics.deleteCategoryAttribute = async function (
+  categoryKey,
+  index,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+  if (
+    !category.attributes ||
+    index < 0 ||
+    index >= category.attributes.length
+  ) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  category.attributes.splice(index, 1);
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
+export default mongoose.model("BookletOption", bookletOptionSchema);

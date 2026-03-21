@@ -4,36 +4,85 @@ export const getAllOptions = async () => {
   return await Options.getAllOptions();
 };
 
-export const addOptionValue = async (category, value) => {
-  return await Options.addOptionValue(category, value);
-};
-
-export const updateOptionValue = async (category, index, newValue) => {
-  return await Options.updateOptionValue(category, index, newValue);
-};
-
-export const deleteOptionValue = async (category, index) => {
-  return await Options.deleteOptionValue(category, index);
-};
-
-export const addCategory = async (categoryName) => {
-  // No validation - allow any characters
-  if (!categoryName || !categoryName.trim()) {
-    throw new Error("Category name is required");
+export const addCategory = async (categoryKey, displayName) => {
+  if (!categoryKey || !categoryKey.trim()) {
+    throw new Error("Category key is required");
   }
 
-  return await Options.addCategory(categoryName.trim());
+  return await Options.addCategory(
+    categoryKey.trim(),
+    displayName || categoryKey.trim(),
+  );
 };
 
-export const deleteCategory = async (categoryName) => {
-  return await Options.deleteCategory(categoryName);
+export const addSubcategory = async (
+  categoryKey,
+  subcategoryKey,
+  displayName,
+) => {
+  if (!categoryKey || !categoryKey.trim()) {
+    throw new Error("Category key is required");
+  }
+  if (!subcategoryKey || !subcategoryKey.trim()) {
+    throw new Error("Subcategory key is required");
+  }
+
+  return await Options.addSubcategory(
+    categoryKey.trim(),
+    subcategoryKey.trim(),
+    displayName || subcategoryKey.trim(),
+  );
+};
+
+export const deleteCategory = async (categoryKey) => {
+  return await Options.deleteCategory(categoryKey);
+};
+
+export const deleteSubcategory = async (categoryKey, subcategoryKey) => {
+  return await Options.deleteSubcategory(categoryKey, subcategoryKey);
+};
+
+export const addAttribute = async (categoryKey, subcategoryKey, value) => {
+  if (!value || !value.trim()) {
+    throw new Error("Attribute value is required");
+  }
+
+  return await Options.addAttribute(categoryKey, subcategoryKey, value.trim());
+};
+
+export const updateAttribute = async (
+  categoryKey,
+  subcategoryKey,
+  index,
+  newValue,
+) => {
+  if (!newValue || !newValue.trim()) {
+    throw new Error("New value is required");
+  }
+
+  return await Options.updateAttribute(
+    categoryKey,
+    subcategoryKey,
+    parseInt(index),
+    newValue.trim(),
+  );
+};
+
+export const deleteAttribute = async (categoryKey, subcategoryKey, index) => {
+  return await Options.deleteAttribute(
+    categoryKey,
+    subcategoryKey,
+    parseInt(index),
+  );
 };
 
 export default {
   getAllOptions,
-  addOptionValue,
-  updateOptionValue,
-  deleteOptionValue,
   addCategory,
+  addSubcategory,
   deleteCategory,
+  deleteSubcategory,
+  addAttribute,
+  updateAttribute,
+  deleteAttribute,
 };

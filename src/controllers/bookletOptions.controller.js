@@ -1,8 +1,8 @@
-import optionsService from "../services/options.service.js";
+import BookletOption from "../models/bookletOptions.model.js";
 
 export const getAllOptions = async (req, res) => {
   try {
-    const options = await optionsService.getAllOptions();
+    const options = await BookletOption.getAllOptions();
 
     res.status(200).json({
       success: true,
@@ -19,7 +19,7 @@ export const getAllOptions = async (req, res) => {
 
 export const addCategory = async (req, res) => {
   try {
-    const { categoryKey, displayName } = req.body;
+    const { categoryKey } = req.body;
 
     if (!categoryKey) {
       return res.status(400).json({
@@ -28,7 +28,7 @@ export const addCategory = async (req, res) => {
       });
     }
 
-    const options = await optionsService.addCategory(categoryKey, displayName);
+    const options = await BookletOption.addCategory(categoryKey);
 
     res.status(201).json({
       success: true,
@@ -46,7 +46,7 @@ export const addCategory = async (req, res) => {
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
-    const { subcategoryKey, displayName } = req.body;
+    const { subcategoryKey } = req.body;
 
     if (!subcategoryKey) {
       return res.status(400).json({
@@ -55,10 +55,9 @@ export const addSubcategory = async (req, res) => {
       });
     }
 
-    const options = await optionsService.addSubcategory(
+    const options = await BookletOption.addSubcategory(
       categoryKey,
       subcategoryKey,
-      displayName,
     );
 
     res.status(201).json({
@@ -85,7 +84,7 @@ export const deleteCategory = async (req, res) => {
       });
     }
 
-    const options = await optionsService.deleteCategory(categoryKey);
+    const options = await BookletOption.deleteCategory(categoryKey);
 
     res.status(200).json({
       success: true,
@@ -104,7 +103,7 @@ export const deleteSubcategory = async (req, res) => {
   try {
     const { categoryKey, subcategoryKey } = req.params;
 
-    const options = await optionsService.deleteSubcategory(
+    const options = await BookletOption.deleteSubcategory(
       categoryKey,
       subcategoryKey,
     );
@@ -134,7 +133,7 @@ export const addAttribute = async (req, res) => {
       });
     }
 
-    const options = await optionsService.addAttribute(
+    const options = await BookletOption.addAttribute(
       categoryKey,
       subcategoryKey,
       value,
@@ -165,7 +164,7 @@ export const updateAttribute = async (req, res) => {
       });
     }
 
-    const options = await optionsService.updateAttribute(
+    const options = await BookletOption.updateAttribute(
       categoryKey,
       subcategoryKey,
       parseInt(index),
@@ -189,7 +188,7 @@ export const deleteAttribute = async (req, res) => {
   try {
     const { categoryKey, subcategoryKey, index } = req.params;
 
-    const options = await optionsService.deleteAttribute(
+    const options = await BookletOption.deleteAttribute(
       categoryKey,
       subcategoryKey,
       parseInt(index),
@@ -198,6 +197,90 @@ export const deleteAttribute = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Attribute deleted from "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Category-level attribute methods
+export const addCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await BookletOption.addCategoryAttribute(
+      categoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await BookletOption.updateCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+
+    const options = await BookletOption.deleteCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${categoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
@@ -217,4 +300,7 @@ export default {
   addAttribute,
   updateAttribute,
   deleteAttribute,
+  addCategoryAttribute,
+  updateCategoryAttribute,
+  deleteCategoryAttribute,
 };
