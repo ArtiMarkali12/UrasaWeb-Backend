@@ -12,7 +12,7 @@ export const createShoppingBagQuote = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Shopping bag quote created successfully",
+      message: "Shopping bag quote is created successfully",
       data: bag,
     });
   } catch (error) {
