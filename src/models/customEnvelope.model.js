@@ -5,82 +5,88 @@ const customEnvelopeSchema = new mongoose.Schema(
     sizeStandard: {
       size: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
 
     paperTypeAndWeight: {
       paperMaterial: {
         type: String,
-        required: true
+        required: true,
       },
       gsmWeight: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
 
     styleAndFeatures: {
       sealType: {
         type: String,
-        required: true
+        required: true,
       },
       windowOptions: [
         {
-          type: String
-        }
-      ]
+          type: String,
+        },
+      ],
     },
 
     printingAndQuantity: {
       printColors: {
         type: String,
-        required: true
+        required: true,
       },
       quantityRequired: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     },
 
     customerDetails: {
       name: {
         type: String,
-        required: true
+        required: true,
       },
       email: {
         type: String,
-        required: true
+        required: true,
       },
       phone: {
         type: String,
-        required: true
+        required: true,
       },
       address: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     timeline: {
       orderDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
       },
       expectedDate: {
-        type: Date
+        type: Date,
       },
       deliveryDate: {
-        type: Date
-      }
+        type: Date,
+      },
     },
 
     files: [
       {
-        type: String
-      }
-    ]
+        type: String,
+      },
+    ],
+
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Completed"],
+      default: "Pending",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("CustomEnvelope", customEnvelopeSchema);

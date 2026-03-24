@@ -4,120 +4,119 @@ const bookletSchema = new mongoose.Schema(
   {
     quantity: {
       type: String,
-      required: true
+      required: true,
     },
 
     bookSize: {
       type: String,
-      required: true
+      required: true,
     },
 
     orientation: {
       type: String,
-      enum: ["portrait", "landscape"]
+      enum: ["portrait", "landscape"],
     },
 
     bindingStyle: {
       bindingType: {
-        type: String
+        type: String,
       },
 
       coverStyle: {
-        type: String
+        type: String,
       },
 
       coverFlaps: {
         type: Boolean,
-        default: false
-      }
+        default: false,
+      },
     },
 
     interiorSpecifications: {
       numberOfPages: {
-        type: Number
+        type: Number,
       },
 
       printColor: {
-        type: String
+        type: String,
       },
 
       paperWeight: {
-        type: String
+        type: String,
       },
 
       paperType: {
-        type: String
+        type: String,
       },
 
       coverFinish: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     specialFinishing: {
       printFinishing: [
         {
-          type: String
-        }
+          type: String,
+        },
       ],
 
       pageEdges: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     packaging: {
-      type: String
+      type: String,
     },
 
     additionalNotes: {
-      type: String
+      type: String,
     },
 
     customerDetails: {
       name: {
         type: String,
-        required: true
+        required: true,
       },
 
       email: {
         type: String,
-        required: true
+        required: true,
       },
 
       phone: {
         type: String,
-        required: true
+        required: true,
       },
 
       address: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     timeline: {
       orderDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
       },
 
       expectedDate: {
-        type: Date
+        type: Date,
       },
 
       deliveryDate: {
-        type: Date
-      }
+        type: Date,
+      },
     },
 
     files: [
       {
-        type: String
-      }
-    ]
-
+        type: String,
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Booklet", bookletSchema);

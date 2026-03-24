@@ -1,93 +1,306 @@
-import optionsService from "../services/ledgerRegisterOptions.service.js";
+import LedgerRegisterOption from "../models/ledgerRegisterOptions.model.js";
 
-export const getAllOptions = async (req,res)=>{
+export const getAllOptions = async (req, res) => {
+  try {
+    const options = await LedgerRegisterOption.getAllOptions();
 
-  const options = await optionsService.getAllOptions();
-
-  res.status(200).json({
-    success:true,
-    data:options
-  });
-
+    res.status(200).json({
+      success: true,
+      data: options,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching options",
+      error: error.message,
+    });
+  }
 };
 
-export const addOptionValue = async (req,res,category)=>{
+export const addCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.body;
 
-  try{
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
 
-    const {value} = req.body;
-
-    const options = await optionsService.addOptionValue(category,value);
+    const options = await LedgerRegisterOption.addCategory(categoryKey);
 
     res.status(201).json({
-      success:true,
-      data:options
+      success: true,
+      message: `Category "${categoryKey}" added successfully`,
+      data: options,
     });
-
-  }catch(error){
-
-    res.status(500).json({
-      success:false,
-      message:error.message
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
-
   }
-
 };
 
-export const updateOptionValue = async (req,res,category)=>{
+export const addSubcategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { subcategoryKey } = req.body;
 
-  try{
+    if (!subcategoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Subcategory key is required",
+      });
+    }
 
-    const index = req.params.index;
+    const options = await LedgerRegisterOption.addSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
 
-    const {newValue} = req.body;
-
-    const options = await optionsService.updateOptionValue(category,index,newValue);
-
-    res.status(200).json({
-      success:true,
-      data:options
+    res.status(201).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
     });
-
-  }catch(error){
-
-    res.status(500).json({
-      success:false,
-      message:error.message
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
-
   }
-
 };
 
-export const deleteOptionValue = async (req,res,category)=>{
+export const deleteCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.body;
 
-  try{
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
 
-    const index = req.params.index;
-
-    const options = await optionsService.deleteOptionValue(category,index);
+    const options = await LedgerRegisterOption.deleteCategory(categoryKey);
 
     res.status(200).json({
-      success:true,
-      data:options
+      success: true,
+      message: `Category "${categoryKey}" deleted successfully`,
+      data: options,
     });
-
-  }catch(error){
-
-    res.status(500).json({
-      success:false,
-      message:error.message
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
-
   }
+};
 
+export const deleteSubcategory = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+
+    const options = await LedgerRegisterOption.deleteSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await LedgerRegisterOption.addAttribute(
+      categoryKey,
+      subcategoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await LedgerRegisterOption.updateAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey, index } = req.params;
+
+    const options = await LedgerRegisterOption.deleteAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Category-level attribute methods
+export const addCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await LedgerRegisterOption.addCategoryAttribute(
+      categoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await LedgerRegisterOption.updateCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+
+    const options = await LedgerRegisterOption.deleteCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 export default {
   getAllOptions,
-  addOptionValue,
-  updateOptionValue,
-  deleteOptionValue
+  addCategory,
+  addSubcategory,
+  deleteCategory,
+  deleteSubcategory,
+  addAttribute,
+  updateAttribute,
+  deleteAttribute,
+  addCategoryAttribute,
+  updateCategoryAttribute,
+  deleteCategoryAttribute,
 };

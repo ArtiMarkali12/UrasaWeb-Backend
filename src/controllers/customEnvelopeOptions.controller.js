@@ -1,101 +1,306 @@
-import customEnvelopeOptionsService from "../services/customEnvelopeOptions.service.js";
+import CustomEnvelopeOption from "../models/customEnvelopeOptions.model.js";
 
-export const getAllCustomEnvelopeOptions = async (req, res) => {
+export const getAllOptions = async (req, res) => {
   try {
-    const options = await customEnvelopeOptionsService.getAllCustomEnvelopeOptions();
+    const options = await CustomEnvelopeOption.getAllOptions();
 
     res.status(200).json({
       success: true,
-      data: options
+      data: options,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching custom envelope options",
-      error: error.message
+      message: "Error fetching options",
+      error: error.message,
     });
   }
 };
 
-export const addCustomEnvelopeOptionValue = async (req, res, category) => {
+export const addCategory = async (req, res) => {
   try {
-    const { value } = req.body;
+    const { categoryKey } = req.body;
 
-    if (!value) {
+    if (!categoryKey) {
       return res.status(400).json({
         success: false,
-        message: "Value is required"
+        message: "Category key is required",
       });
     }
 
-    const options = await customEnvelopeOptionsService.addCustomEnvelopeOptionValue(category, value);
+    const options = await CustomEnvelopeOption.addCategory(categoryKey);
 
     res.status(201).json({
       success: true,
-      message: `${category} option added successfully`,
-      data: options
+      message: `Category "${categoryKey}" added successfully`,
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
-export const updateCustomEnvelopeOptionValue = async (req, res, category) => {
+export const addSubcategory = async (req, res) => {
   try {
-    const { index } = req.params;
+    const { categoryKey } = req.params;
+    const { subcategoryKey } = req.body;
+
+    if (!subcategoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Subcategory key is required",
+      });
+    }
+
+    const options = await CustomEnvelopeOption.addSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.body;
+
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
+
+    const options = await CustomEnvelopeOption.deleteCategory(categoryKey);
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" deleted successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteSubcategory = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+
+    const options = await CustomEnvelopeOption.deleteSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
     const { value } = req.body;
 
     if (!value) {
       return res.status(400).json({
         success: false,
-        message: "Value is required"
+        message: "Attribute value is required",
       });
     }
 
-    const options = await customEnvelopeOptionsService.updateCustomEnvelopeOptionValue(category, parseInt(index), value);
+    const options = await CustomEnvelopeOption.addAttribute(
+      categoryKey,
+      subcategoryKey,
+      value,
+    );
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
-      message: `${category} option updated successfully`,
-      data: options
+      message: `Attribute added to "${subcategoryKey}" successfully`,
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
-export const deleteCustomEnvelopeOptionValue = async (req, res, category) => {
+export const updateAttribute = async (req, res) => {
   try {
-    const { index } = req.params;
+    const { categoryKey, subcategoryKey, index } = req.params;
+    const { value } = req.body;
 
-    const options = await customEnvelopeOptionsService.deleteCustomEnvelopeOptionValue(category, parseInt(index));
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await CustomEnvelopeOption.updateAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+      value,
+    );
 
     res.status(200).json({
       success: true,
-      message: `${category} option deleted successfully`,
-      data: options
+      message: `Attribute updated in "${subcategoryKey}" successfully`,
+      data: options,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
+    });
+  }
+};
+
+export const deleteAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey, index } = req.params;
+
+    const options = await CustomEnvelopeOption.deleteAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Category-level attribute methods
+export const addCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await CustomEnvelopeOption.addCategoryAttribute(
+      categoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await CustomEnvelopeOption.updateCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+
+    const options = await CustomEnvelopeOption.deleteCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
   }
 };
 
 export default {
-  getAllCustomEnvelopeOptions,
-  addCustomEnvelopeOptionValue,
-  updateCustomEnvelopeOptionValue,
-  deleteCustomEnvelopeOptionValue
+  getAllOptions,
+  addCategory,
+  addSubcategory,
+  deleteCategory,
+  deleteSubcategory,
+  addAttribute,
+  updateAttribute,
+  deleteAttribute,
+  addCategoryAttribute,
+  updateCategoryAttribute,
+  deleteCategoryAttribute,
 };

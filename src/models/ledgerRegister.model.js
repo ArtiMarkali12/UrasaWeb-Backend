@@ -98,108 +98,101 @@
 
 // export default mongoose.model("LedgerRegister",ledgerRegisterSchema);
 
-
-
 import mongoose from "mongoose";
 
 const ledgerRegisterSchema = new mongoose.Schema(
-{
-  registerDetails:{
+  {
+    registerDetails: {
+      size: {
+        type: String,
+        required: true,
+      },
 
-    size:{
-      type:String,
-      required:true
+      bindingMaterial: {
+        type: String,
+      },
     },
 
-    bindingMaterial:{
-      type:String
-    }
+    interiorPageSpecification: {
+      numberOfPages: {
+        type: String,
+      },
 
-  },
+      pageType: {
+        type: String,
+      },
 
-  interiorPageSpecification:{
-
-    numberOfPages:{
-      type:String
+      rulingPattern: {
+        type: String,
+      },
     },
 
-    pageType:{
-      type:String
+    finishingProfessionalExtras: {
+      type: [
+        {
+          type: String,
+        },
+      ],
     },
 
-    rulingPattern:{
-      type:String
-    }
+    quantity: {
+      type: Number,
+      required: true,
+    },
 
-  },
+    additionalNotes: {
+      type: String,
+    },
 
-  finishingProfessionalExtras:{
+    customerDetails: {
+      name: {
+        type: String,
+        required: true,
+      },
 
-    type:[
+      email: {
+        type: String,
+        required: true,
+      },
+
+      phone: {
+        type: String,
+        required: true,
+      },
+
+      address: {
+        type: String,
+      },
+    },
+
+    timeline: {
+      orderDate: {
+        type: Date,
+        default: Date.now,
+      },
+
+      expectedDate: {
+        type: Date,
+      },
+
+      deliveryDate: {
+        type: Date,
+      },
+    },
+
+    files: [
       {
-        type:String
-      }
-    ]
+        type: String,
+      },
+    ],
 
-  },
-
-  quantity:{
-    type:Number,
-    required:true
-  },
-
-  additionalNotes:{
-    type:String
-  },
-
-  customerDetails:{
-
-    name:{
-      type:String,
-      required:true
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Completed"],
+      default: "Pending",
     },
-
-    email:{
-      type:String,
-      required:true
-    },
-
-    phone:{
-      type:String,
-      required:true
-    },
-
-    address:{
-      type:String
-    }
-
   },
-
-  timeline:{
-
-    orderDate:{
-      type:Date,
-      default:Date.now
-    },
-
-    expectedDate:{
-      type:Date
-    },
-
-    deliveryDate:{
-      type:Date
-    }
-
-  },
-
-  files:[
-    {
-      type:String
-    }
-  ]
-
-},
-{timestamps:true}
+  { timestamps: true },
 );
 
-export default mongoose.model("LedgerRegister",ledgerRegisterSchema);
+export default mongoose.model("LedgerRegister", ledgerRegisterSchema);

@@ -1,8 +1,8 @@
-import pamphletOptionsService from "../services/pamphletOptions.service.js";
+import PamphletOption from "../models/pamphletOptions.model.js";
 
-export const getAllPamphletOptions = async (req, res) => {
+export const getAllOptions = async (req, res) => {
   try {
-    const options = await pamphletOptionsService.getAllPamphletOptions();
+    const options = await PamphletOption.getAllOptions();
 
     res.status(200).json({
       success: true,
@@ -11,46 +11,151 @@ export const getAllPamphletOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching pamphlet options",
+      message: "Error fetching options",
       error: error.message,
     });
   }
 };
 
-export const addPamphletOptionValue = async (req, res, field) => {
+export const addCategory = async (req, res) => {
   try {
+    const { categoryKey } = req.body;
+
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
+
+    const options = await PamphletOption.addCategory(categoryKey);
+
+    res.status(201).json({
+      success: true,
+      message: `Category "${categoryKey}" added successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addSubcategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { subcategoryKey } = req.body;
+
+    if (!subcategoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Subcategory key is required",
+      });
+    }
+
+    const options = await PamphletOption.addSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.body;
+
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
+
+    const options = await PamphletOption.deleteCategory(categoryKey);
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" deleted successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteSubcategory = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+
+    const options = await PamphletOption.deleteSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
     const { value } = req.body;
 
     if (!value) {
       return res.status(400).json({
         success: false,
-        message: "Value is required",
+        message: "Attribute value is required",
       });
     }
 
-    const options = await pamphletOptionsService.addPamphletOptionValue(
-      field,
+    const options = await PamphletOption.addAttribute(
+      categoryKey,
+      subcategoryKey,
       value,
     );
 
     res.status(201).json({
       success: true,
-      message: `${field} added successfully`,
+      message: `Attribute added to "${subcategoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error adding pamphlet option",
-      error: error.message,
+      message: error.message,
     });
   }
 };
 
-export const updatePamphletOptionValue = async (req, res, field) => {
+export const updateAttribute = async (req, res) => {
   try {
+    const { categoryKey, subcategoryKey, index } = req.params;
     const { value } = req.body;
-    const index = parseInt(req.params.index);
 
     if (!value) {
       return res.status(400).json({
@@ -59,80 +164,143 @@ export const updatePamphletOptionValue = async (req, res, field) => {
       });
     }
 
-    if (isNaN(index)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid index",
-      });
-    }
-
-    const options = await pamphletOptionsService.updatePamphletOptionValue(
-      field,
-      index,
+    const options = await PamphletOption.updateAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
       value,
     );
 
-    if (!options) {
-      return res.status(404).json({
-        success: false,
-        message: "Option not found",
-      });
-    }
-
     res.status(200).json({
       success: true,
-      message: `${field} updated successfully`,
+      message: `Attribute updated in "${subcategoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error updating pamphlet option",
-      error: error.message,
+      message: error.message,
     });
   }
 };
 
-export const deletePamphletOptionValue = async (req, res, field) => {
+export const deleteAttribute = async (req, res) => {
   try {
-    const index = parseInt(req.params.index);
+    const { categoryKey, subcategoryKey, index } = req.params;
 
-    if (isNaN(index)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid index",
-      });
-    }
-
-    const options = await pamphletOptionsService.deletePamphletOptionValue(
-      field,
-      index,
+    const options = await PamphletOption.deleteAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
     );
-
-    if (!options) {
-      return res.status(404).json({
-        success: false,
-        message: "Option not found",
-      });
-    }
 
     res.status(200).json({
       success: true,
-      message: `${field} deleted successfully`,
+      message: `Attribute deleted from "${subcategoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error deleting pamphlet option",
-      error: error.message,
+      message: error.message,
+    });
+  }
+};
+
+// Category-level attribute methods
+export const addCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await PamphletOption.addCategoryAttribute(
+      categoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await PamphletOption.updateCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+
+    const options = await PamphletOption.deleteCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
   }
 };
 
 export default {
-  getAllPamphletOptions,
-  addPamphletOptionValue,
-  updatePamphletOptionValue,
-  deletePamphletOptionValue,
+  getAllOptions,
+  addCategory,
+  addSubcategory,
+  deleteCategory,
+  deleteSubcategory,
+  addAttribute,
+  updateAttribute,
+  deleteAttribute,
+  addCategoryAttribute,
+  updateCategoryAttribute,
+  deleteCategoryAttribute,
 };

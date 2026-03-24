@@ -5,7 +5,7 @@ export const createMagazineQuote = async (req, res) => {
     const data = req.body;
 
     if (req.files) {
-      data.files = req.files.map(file => file.path);
+      data.files = req.files.map((file) => file.path);
     }
 
     const magazine = await magazineService.createMagazine(data);
@@ -13,14 +13,13 @@ export const createMagazineQuote = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Magazine quote created successfully",
-      data: magazine
+      data: magazine,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error creating magazine quote",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -31,13 +30,12 @@ export const getAllQuotes = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: magazines
+      data: magazines,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching magazine quotes"
+      message: "Error fetching magazine quotes",
     });
   }
 };
@@ -49,19 +47,45 @@ export const getMagazineById = async (req, res) => {
     if (!magazine) {
       return res.status(404).json({
         success: false,
-        message: "Magazine quote not found"
+        message: "Magazine quote not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: magazine
+      data: magazine,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching magazine quote"
+      message: "Error fetching magazine quote",
+    });
+  }
+};
+
+export const updateMagazine = async (req, res) => {
+  try {
+    const data = req.body;
+
+    const magazine = await magazineService.updateMagazine(req.params.id, data);
+
+    if (!magazine) {
+      return res.status(404).json({
+        success: false,
+        message: "Magazine quote not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Magazine quote updated successfully",
+      data: magazine,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating magazine quote",
+      error: error.message,
     });
   }
 };
@@ -72,13 +96,12 @@ export const deleteMagazine = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Magazine quote deleted successfully"
+      message: "Magazine quote deleted successfully",
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting magazine quote"
+      message: "Error deleting magazine quote",
     });
   }
 };
@@ -87,5 +110,6 @@ export default {
   createMagazineQuote,
   getAllQuotes,
   getMagazineById,
-  deleteMagazine
+  updateMagazine,
+  deleteMagazine,
 };

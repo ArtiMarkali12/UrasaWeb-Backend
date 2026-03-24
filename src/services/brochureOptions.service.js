@@ -4,40 +4,70 @@ export const getAllBrochureOptions = async () => {
   let options = await BrochureOptions.findOne();
 
   if (!options) {
-    options = new BrochureOptions({
-      foldStyles: [],
-      sizes: [],
-      paperStocks: [],
-      finishingTypes: [],
+    options = await BrochureOptions.create({
+      categories: new Map(),
     });
-    await options.save();
   }
 
   return options;
 };
 
-export const addBrochureOptionValue = async (field, value) => {
+export const addBrochureOptionValue = async (category, value) => {
   const options = await getAllBrochureOptions();
-  options[field].push(value);
-  return await options.save();
+
+  if (!options[category]) {
+    throw new Error(`Invalid category: ${category}`);
+  }
+
+  if (options[category].includes(value)) {
+    throw new Error(`Value already exists in ${category}`);
+  }
+
+  options[category].push(value);
+  await options.save();
+
+  return options;
 };
 
-export const updateBrochureOptionValue = async (field, index, value) => {
+export const updateBrochureOptionValue = async (category, index, newValue) => {
   const options = await getAllBrochureOptions();
-  if (options[field][index] !== undefined) {
-    options[field][index] = value;
-    return await options.save();
+
+  if (!options[category]) {
+    throw new Error(`Invalid category: ${category}`);
   }
-  return null;
+
+  if (index < 0 || index >= options[category].length) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  if (
+    options[category].includes(newValue) &&
+    options[category][index] !== newValue
+  ) {
+    throw new Error(`Value already exists in ${category}`);
+  }
+
+  options[category][index] = newValue;
+  await options.save();
+
+  return options;
 };
 
-export const deleteBrochureOptionValue = async (field, index) => {
+export const deleteBrochureOptionValue = async (category, index) => {
   const options = await getAllBrochureOptions();
-  if (options[field][index] !== undefined) {
-    options[field].splice(index, 1);
-    return await options.save();
+
+  if (!options[category]) {
+    throw new Error(`Invalid category: ${category}`);
   }
-  return null;
+
+  if (index < 0 || index >= options[category].length) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  options[category].splice(index, 1);
+  await options.save();
+
+  return options;
 };
 
 export default {

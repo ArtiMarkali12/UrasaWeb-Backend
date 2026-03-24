@@ -8,16 +8,19 @@ import connectDB from "./src/config/db.js";
 import bookletQuoteRoutes from "./src/routes/booklet.routes.js";
 import bookletOptionsRoutes from "./src/routes/bookletOptions.routes.js";
 import artbookRoutes from "./src/routes/artbook.routes.js";
+import artbookOptionsRoutes from "./src/routes/artbookOptions.routes.js";
+import brochureRoutes from "./src/routes/brochure.routes.js";
+import brochureOptionsRoutes from "./src/routes/brochureOptions.routes.js";
 import businessCardRoutes from "./src/routes/businessCard.routes.js";
 import customEnvelopeRoutes from "./src/routes/customEnvelope.routes.js";
 import customCardRoutes from "./src/routes/customCard.routes.js";
 import magazineRoutes from "./src/routes/magazine.routes.js";
 import magazineOptionsRoutes from "./src/routes/magazineOptions.routes.js";
-import brochureRoutes from "./src/routes/brochure.routes.js";
 import pamphletRoutes from "./src/routes/pamphlet.routes.js";
 import productCatalogueRoutes from "./src/routes/productCatalogue.routes.js";
 
 import notebookRoutes from "./src/routes/notebook.routes.js";
+import notebookOptionsRoutes from "./src/routes/notebookOptions.routes.js";
 import ledgerRegisterRoutes from "./src/routes/ledgerRegister.routes.js";
 import letterheadRoutes from "./src/routes/letterhead.routes.js";
 import shoppingBagsRoutes from "./src/routes/shoppingBags.routes.js";
@@ -57,6 +60,9 @@ app.use("/api/booklet-options", bookletOptionsRoutes);
 
 app.use("/api/notebook-quote", upload.array("files", 10), notebookRoutes);
 
+/* Notebook Options (No upload) */
+app.use("/api/notebook-options", notebookOptionsRoutes);
+
 app.use(
   "/api/ledger-register",
   upload.array("files", 10),
@@ -67,7 +73,10 @@ app.use("/api/letterhead", upload.array("files", 10), letterheadRoutes);
 
 app.use("/api/shopping-bags", upload.array("files", 10), shoppingBagsRoutes);
 
-app.use("/api/artbook", upload.array("files", 10), artbookRoutes);
+app.use("/api/artbook-quote", upload.array("files", 10), artbookRoutes);
+
+/* Artbook Options (No upload) */
+app.use("/api/artbook-options", artbookOptionsRoutes);
 
 app.use("/api/business-card", upload.array("files", 10), businessCardRoutes);
 
@@ -84,7 +93,10 @@ app.use("/api/magazines", upload.array("files", 10), magazineRoutes);
 /* Magazine Options (No upload) */
 app.use("/api/magazine-options", magazineOptionsRoutes);
 
-app.use("/api/brochure", upload.array("files", 10), brochureRoutes);
+app.use("/api/brochure-quote", upload.array("files", 10), brochureRoutes);
+
+/* Brochure Options (No upload) */
+app.use("/api/brochure-options", brochureOptionsRoutes);
 
 app.use("/api/pamphlet", upload.array("files", 10), pamphletRoutes);
 

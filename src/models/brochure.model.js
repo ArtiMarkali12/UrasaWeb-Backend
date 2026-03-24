@@ -73,6 +73,12 @@ const brochureSchema = new mongoose.Schema(
         type: String,
       },
     ],
+
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Completed"],
+      default: "Pending",
+    },
   },
   { timestamps: true },
 );

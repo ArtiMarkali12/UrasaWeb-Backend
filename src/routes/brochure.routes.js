@@ -5,64 +5,57 @@ import brochureController from "../controllers/brochure.controller.js";
 import brochureOptionsController from "../controllers/brochureOptions.controller.js";
 import validateBrochureQuote from "../validators/brochure.validator.js";
 
-/* ---------------- Brochure CRUD APIs ---------------- */
+/* ---------------- Brochure Quote CRUD APIs ---------------- */
 
 router.post("/", validateBrochureQuote, brochureController.createBrochureQuote);
 
 router.get("/", brochureController.getAllBrochures);
 
 /* ---------------- Brochure Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
 router.get("/options", brochureOptionsController.getAllBrochureOptions);
 
-/* POST APIs - Add Option Values */
-router.post("/fold-styles", (req, res) =>
-  brochureOptionsController.addBrochureOptionValue(req, res, "foldStyles"),
+/* Category Management (Main Categories) */
+router.post("/category", brochureOptionsController.addCategory);
+router.delete("/category", brochureOptionsController.deleteCategory);
+
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  brochureOptionsController.addSubcategory,
 );
-router.post("/sizes", (req, res) =>
-  brochureOptionsController.addBrochureOptionValue(req, res, "sizes"),
-);
-router.post("/paper-stocks", (req, res) =>
-  brochureOptionsController.addBrochureOptionValue(req, res, "paperStocks"),
-);
-router.post("/finishing-types", (req, res) =>
-  brochureOptionsController.addBrochureOptionValue(req, res, "finishingTypes"),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  brochureOptionsController.deleteSubcategory,
 );
 
-/* PUT APIs - Update Option Values */
-router.put("/fold-styles/:index", (req, res) =>
-  brochureOptionsController.updateBrochureOptionValue(req, res, "foldStyles"),
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  brochureOptionsController.addAttribute,
 );
-router.put("/sizes/:index", (req, res) =>
-  brochureOptionsController.updateBrochureOptionValue(req, res, "sizes"),
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  brochureOptionsController.updateAttribute,
 );
-router.put("/paper-stocks/:index", (req, res) =>
-  brochureOptionsController.updateBrochureOptionValue(req, res, "paperStocks"),
-);
-router.put("/finishing-types/:index", (req, res) =>
-  brochureOptionsController.updateBrochureOptionValue(
-    req,
-    res,
-    "finishingTypes",
-  ),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  brochureOptionsController.deleteAttribute,
 );
 
-/* DELETE APIs - Delete Option Values */
-router.delete("/fold-styles/:index", (req, res) =>
-  brochureOptionsController.deleteBrochureOptionValue(req, res, "foldStyles"),
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  brochureOptionsController.addCategoryAttribute,
 );
-router.delete("/sizes/:index", (req, res) =>
-  brochureOptionsController.deleteBrochureOptionValue(req, res, "sizes"),
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  brochureOptionsController.updateCategoryAttribute,
 );
-router.delete("/paper-stocks/:index", (req, res) =>
-  brochureOptionsController.deleteBrochureOptionValue(req, res, "paperStocks"),
-);
-router.delete("/finishing-types/:index", (req, res) =>
-  brochureOptionsController.deleteBrochureOptionValue(
-    req,
-    res,
-    "finishingTypes",
-  ),
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  brochureOptionsController.deleteCategoryAttribute,
 );
 
 /* ---------------- Brochure ID-based APIs (must be last) ---------------- */

@@ -5,88 +5,94 @@ const customCardSchema = new mongoose.Schema(
     selectCardTypeAndSize: {
       selectCard: {
         type: String,
-        required: true
+        required: true,
       },
       size: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
 
     paperAndQuantity: {
       paperStock: {
         type: String,
-        required: true
+        required: true,
       },
       quantity: {
         type: Number,
-        required: true
-      }
+        required: true,
+      },
     },
 
     printingAndFinish: {
       printedSides: {
         type: String,
-        required: true
+        required: true,
       },
       lamination: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     extras: {
       corners: {
-        type: String
+        type: String,
       },
       envelopesIncluded: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     additionalNotes: {
       notes: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     customerDetails: {
       name: {
         type: String,
-        required: true
+        required: true,
       },
       email: {
         type: String,
-        required: true
+        required: true,
       },
       phone: {
         type: String,
-        required: true
+        required: true,
       },
       address: {
-        type: String
-      }
+        type: String,
+      },
     },
 
     timeline: {
       orderDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
       },
       expectedDate: {
-        type: Date
+        type: Date,
       },
       deliveryDate: {
-        type: Date
-      }
+        type: Date,
+      },
     },
 
     files: [
       {
-        type: String
-      }
-    ]
+        type: String,
+      },
+    ],
+
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Completed"],
+      default: "Pending",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("CustomCard", customCardSchema);

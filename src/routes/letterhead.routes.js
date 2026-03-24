@@ -1,140 +1,72 @@
-// import express from "express";
-
-// const router = express.Router();
-
-// import letterheadController from "../controllers/letterhead.controller.js";
-// import optionsController from "../controllers/letterheadOptions.controller.js";
-// import validateLetterheadQuote from "../validators/letterheadQuote.validator.js";
-
-// /* Letterhead Quote */
-
-// router.post("/",validateLetterheadQuote,letterheadController.createLetterheadQuote);
-
-// router.get("/",letterheadController.getAllLetterheads);
-
-// /* Options */
-
-// router.get("/options",optionsController.getAllOptions);
-
-// router.post("/size-standards",(req,res)=>
-// optionsController.addOptionValue(req,res,"sizeStandards")
-// );
-
-// router.post("/paper-types",(req,res)=>
-// optionsController.addOptionValue(req,res,"paperTypes")
-// );
-
-// router.post("/paper-weights",(req,res)=>
-// optionsController.addOptionValue(req,res,"paperWeights")
-// );
-
-// router.post("/print-colors",(req,res)=>
-// optionsController.addOptionValue(req,res,"printColors")
-// );
-
-// router.post("/special-finishes",(req,res)=>
-// optionsController.addOptionValue(req,res,"specialFinishes")
-// );
-
-// /* By ID */
-
-// router.get("/:id",letterheadController.getLetterheadById);
-
-// router.delete("/:id",letterheadController.deleteLetterhead);
-
-// export default router;
-
-
-
-
 import express from "express";
-
 const router = express.Router();
 
 import letterheadController from "../controllers/letterhead.controller.js";
-import optionsController from "../controllers/letterheadOptions.controller.js";
+import letterheadOptionsController from "../controllers/letterheadOptions.controller.js";
 import validateLetterheadQuote from "../validators/letterheadQuote.validator.js";
 
-/* Letterhead Quote */
+/* ---------------- Letterhead Quote CRUD APIs ---------------- */
 
-router.post("/",validateLetterheadQuote,letterheadController.createLetterheadQuote);
-
-router.get("/",letterheadController.getAllLetterheads);
-
-/* Options */
-
-router.get("/options",optionsController.getAllOptions);
-
-/* POST */
-
-router.post("/size-standards",(req,res)=>
-optionsController.addOptionValue(req,res,"sizeStandards")
+router.post(
+  "/",
+  validateLetterheadQuote,
+  letterheadController.createLetterheadQuote,
 );
 
-router.post("/paper-types",(req,res)=>
-optionsController.addOptionValue(req,res,"paperTypes")
+router.get("/", letterheadController.getAllLetterheads);
+
+/* ---------------- Letterhead Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
+
+router.get("/options", letterheadOptionsController.getAllOptions);
+
+/* Category Management (Main Categories) */
+router.post("/category", letterheadOptionsController.addCategory);
+router.delete("/category", letterheadOptionsController.deleteCategory);
+
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  letterheadOptionsController.addSubcategory,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  letterheadOptionsController.deleteSubcategory,
 );
 
-router.post("/paper-weights",(req,res)=>
-optionsController.addOptionValue(req,res,"paperWeights")
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  letterheadOptionsController.addAttribute,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  letterheadOptionsController.updateAttribute,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  letterheadOptionsController.deleteAttribute,
 );
 
-router.post("/print-colors",(req,res)=>
-optionsController.addOptionValue(req,res,"printColors")
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  letterheadOptionsController.addCategoryAttribute,
+);
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  letterheadOptionsController.updateCategoryAttribute,
+);
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  letterheadOptionsController.deleteCategoryAttribute,
 );
 
-router.post("/special-finishes",(req,res)=>
-optionsController.addOptionValue(req,res,"specialFinishes")
-);
+/* Letterhead by ID - Must be after /options */
+router.get("/:id", letterheadController.getLetterheadById);
 
-/* PUT */
+router.put("/:id", letterheadController.updateLetterhead);
 
-router.put("/size-standards/:index",(req,res)=>
-optionsController.updateOptionValue(req,res,"sizeStandards")
-);
-
-router.put("/paper-types/:index",(req,res)=>
-optionsController.updateOptionValue(req,res,"paperTypes")
-);
-
-router.put("/paper-weights/:index",(req,res)=>
-optionsController.updateOptionValue(req,res,"paperWeights")
-);
-
-router.put("/print-colors/:index",(req,res)=>
-optionsController.updateOptionValue(req,res,"printColors")
-);
-
-router.put("/special-finishes/:index",(req,res)=>
-optionsController.updateOptionValue(req,res,"specialFinishes")
-);
-
-/* DELETE */
-
-router.delete("/size-standards/:index",(req,res)=>
-optionsController.deleteOptionValue(req,res,"sizeStandards")
-);
-
-router.delete("/paper-types/:index",(req,res)=>
-optionsController.deleteOptionValue(req,res,"paperTypes")
-);
-
-router.delete("/paper-weights/:index",(req,res)=>
-optionsController.deleteOptionValue(req,res,"paperWeights")
-);
-
-router.delete("/print-colors/:index",(req,res)=>
-optionsController.deleteOptionValue(req,res,"printColors")
-);
-
-router.delete("/special-finishes/:index",(req,res)=>
-optionsController.deleteOptionValue(req,res,"specialFinishes")
-);
-
-/* By ID */
-
-router.get("/:id",letterheadController.getLetterheadById);
-
-router.delete("/:id",letterheadController.deleteLetterhead);
+router.delete("/:id", letterheadController.deleteLetterhead);
 
 export default router;

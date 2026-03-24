@@ -1,128 +1,72 @@
 import express from "express";
-
 const router = express.Router();
 
-import ledgerController from "../controllers/ledgerRegister.controller.js";
-import optionsController from "../controllers/ledgerRegisterOptions.controller.js";
+import ledgerRegisterController from "../controllers/ledgerRegister.controller.js";
+import ledgerRegisterOptionsController from "../controllers/ledgerRegisterOptions.controller.js";
 import validateLedgerRegister from "../validators/ledgerRegisterQuote.validator.js";
 
-/* Ledger Quote */
+/* ---------------- Ledger Register Quote CRUD APIs ---------------- */
 
-router.post("/",validateLedgerRegister,ledgerController.createLedgerRegisterQuote);
-
-router.get("/",ledgerController.getAllLedgerRegisters);
-
-/* Options */
-
-router.get("/options",optionsController.getAllOptions);
-
-/* POST */
-
-// router.post("/ledger-sizes",(req,res)=>
-//   optionsController.addOptionValue(req,res,"ledgerSizes")
-// );
-
-// router.post("/binding-types",(req,res)=>
-//   optionsController.addOptionValue(req,res,"bindingTypes")
-// );
-
-router.post("/register-sizes",(req,res)=>
-  optionsController.addOptionValue(req,res,"registerSizes")
+router.post(
+  "/",
+  validateLedgerRegister,
+  ledgerRegisterController.createLedgerRegisterQuote,
 );
 
-router.post("/binding-materials",(req,res)=>
-  optionsController.addOptionValue(req,res,"bindingMaterials")
+router.get("/", ledgerRegisterController.getAllLedgerRegisters);
+
+/* ---------------- Ledger Register Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
+
+router.get("/options", ledgerRegisterOptionsController.getAllOptions);
+
+/* Category Management (Main Categories) */
+router.post("/category", ledgerRegisterOptionsController.addCategory);
+router.delete("/category", ledgerRegisterOptionsController.deleteCategory);
+
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  ledgerRegisterOptionsController.addSubcategory,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  ledgerRegisterOptionsController.deleteSubcategory,
 );
 
-router.post("/number-of-pages",(req,res)=>
-  optionsController.addOptionValue(req,res,"numberOfPages")
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  ledgerRegisterOptionsController.addAttribute,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  ledgerRegisterOptionsController.updateAttribute,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  ledgerRegisterOptionsController.deleteAttribute,
 );
 
-router.post("/page-types",(req,res)=>
-  optionsController.addOptionValue(req,res,"pageTypes")
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  ledgerRegisterOptionsController.addCategoryAttribute,
+);
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  ledgerRegisterOptionsController.updateCategoryAttribute,
+);
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  ledgerRegisterOptionsController.deleteCategoryAttribute,
 );
 
-router.post("/ruling-patterns",(req,res)=>
-  optionsController.addOptionValue(req,res,"rulingPatterns")
-);
+/* Ledger Register by ID - Must be after /options */
+router.get("/:id", ledgerRegisterController.getLedgerRegisterById);
 
-router.post("/finishing-types",(req,res)=>
-  optionsController.addOptionValue(req,res,"finishingTypes")
-);
+router.put("/:id", ledgerRegisterController.updateLedgerRegister);
 
-/* PUT */
-
-// router.put("/ledger-sizes/:index",(req,res)=>
-//   optionsController.updateOptionValue(req,res,"ledgerSizes")
-// );
-
-// router.put("/binding-types/:index",(req,res)=>
-//   optionsController.updateOptionValue(req,res,"bindingTypes")
-// );
-
-router.put("/register-sizes/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"registerSizes")
-);
-
-router.put("/binding-materials/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"bindingMaterials")
-);
-
-router.put("/number-of-pages/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"numberOfPages")
-);
-
-router.put("/page-types/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"pageTypes")
-);
-
-router.put("/ruling-patterns/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"rulingPatterns")
-);
-
-router.put("/finishing-types/:index",(req,res)=>
-  optionsController.updateOptionValue(req,res,"finishingTypes")
-);
-
-/* DELETE */
-
-// router.delete("/ledger-sizes/:index",(req,res)=>
-//   optionsController.deleteOptionValue(req,res,"ledgerSizes")
-// );
-
-// router.delete("/binding-types/:index",(req,res)=>
-//   optionsController.deleteOptionValue(req,res,"bindingTypes")
-// );
-
-
-router.delete("/register-sizes/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"registerSizes")
-);
-
-router.delete("/binding-materials/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"bindingMaterials")
-);
-
-router.delete("/number-of-pages/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"numberOfPages")
-);
-
-router.delete("/page-types/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"pageTypes")
-);
-
-router.delete("/ruling-patterns/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"rulingPatterns")
-);
-
-router.delete("/finishing-types/:index",(req,res)=>
-  optionsController.deleteOptionValue(req,res,"finishingTypes")
-);
-
-/* Ledger by ID */
-
-router.get("/:id",ledgerController.getLedgerRegisterById);
-
-router.delete("/:id",ledgerController.deleteLedgerRegister);
+router.delete("/:id", ledgerRegisterController.deleteLedgerRegister);
 
 export default router;

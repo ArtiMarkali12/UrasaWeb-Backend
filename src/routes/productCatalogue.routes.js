@@ -5,7 +5,7 @@ import productCatalogueController from "../controllers/productCatalogue.controll
 import productCatalogueOptionsController from "../controllers/productCatalogueOptions.controller.js";
 import validateProductCatalogueQuote from "../validators/productCatalogue.validator.js";
 
-/* ---------------- Product Catalogue CRUD APIs ---------------- */
+/* ---------------- Product Catalogue Quote CRUD APIs ---------------- */
 
 router.post(
   "/",
@@ -16,168 +16,56 @@ router.post(
 router.get("/", productCatalogueController.getAllProductCatalogues);
 
 /* ---------------- Product Catalogue Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
-router.get(
-  "/options",
-  productCatalogueOptionsController.getAllProductCatalogueOptions,
-);
+router.get("/options", productCatalogueOptionsController.getAllOptions);
 
-/* POST APIs - Add Option Values */
-router.post("/finished-sizes-closed", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "finishedSizesClosed",
-  ),
+/* Category Management (Main Categories) */
+router.post("/category", productCatalogueOptionsController.addCategory);
+router.delete("/category", productCatalogueOptionsController.deleteCategory);
+
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  productCatalogueOptionsController.addSubcategory,
 );
-router.post("/binding-methods", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "bindingMethods",
-  ),
-);
-router.post("/cover-papers-heavy", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "coverPapersHeavy",
-  ),
-);
-router.post("/inner-pages-text", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "innerPagesText",
-  ),
-);
-router.post("/print-colors", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "printColors",
-  ),
-);
-router.post("/total-number-of-pages", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "totalNumberOfPages",
-  ),
-);
-router.post("/cover-finishes-extras", (req, res) =>
-  productCatalogueOptionsController.addProductCatalogueOptionValue(
-    req,
-    res,
-    "coverFinishesExtras",
-  ),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  productCatalogueOptionsController.deleteSubcategory,
 );
 
-/* PUT APIs - Update Option Values */
-router.put("/finished-sizes-closed/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "finishedSizesClosed",
-  ),
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  productCatalogueOptionsController.addAttribute,
 );
-router.put("/binding-methods/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "bindingMethods",
-  ),
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  productCatalogueOptionsController.updateAttribute,
 );
-router.put("/cover-papers-heavy/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "coverPapersHeavy",
-  ),
-);
-router.put("/inner-pages-text/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "innerPagesText",
-  ),
-);
-router.put("/print-colors/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "printColors",
-  ),
-);
-router.put("/total-number-of-pages/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "totalNumberOfPages",
-  ),
-);
-router.put("/cover-finishes-extras/:index", (req, res) =>
-  productCatalogueOptionsController.updateProductCatalogueOptionValue(
-    req,
-    res,
-    "coverFinishesExtras",
-  ),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  productCatalogueOptionsController.deleteAttribute,
 );
 
-/* DELETE APIs - Delete Option Values */
-router.delete("/finished-sizes-closed/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "finishedSizesClosed",
-  ),
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  productCatalogueOptionsController.addCategoryAttribute,
 );
-router.delete("/binding-methods/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "bindingMethods",
-  ),
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  productCatalogueOptionsController.updateCategoryAttribute,
 );
-router.delete("/cover-papers-heavy/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "coverPapersHeavy",
-  ),
-);
-router.delete("/inner-pages-text/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "innerPagesText",
-  ),
-);
-router.delete("/print-colors/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "printColors",
-  ),
-);
-router.delete("/total-number-of-pages/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "totalNumberOfPages",
-  ),
-);
-router.delete("/cover-finishes-extras/:index", (req, res) =>
-  productCatalogueOptionsController.deleteProductCatalogueOptionValue(
-    req,
-    res,
-    "coverFinishesExtras",
-  ),
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  productCatalogueOptionsController.deleteCategoryAttribute,
 );
 
-/* ---------------- Product Catalogue ID-based APIs (must be last) ---------------- */
-
+/* Product Catalogue by ID - Must be after /options */
 router.get("/:id", productCatalogueController.getProductCatalogueById);
+
+router.put("/:id", productCatalogueController.updateProductCatalogue);
 
 router.delete("/:id", productCatalogueController.deleteProductCatalogue);
 

@@ -13,6 +13,10 @@ export const getMagazineById = async (id) => {
   return await Magazine.findById(id);
 };
 
+export const updateMagazine = async (id, data) => {
+  return await Magazine.findByIdAndUpdate(id, data, { new: true });
+};
+
 export const deleteMagazine = async (id) => {
   return await Magazine.findByIdAndDelete(id);
 };
@@ -21,5 +25,6 @@ export default {
   createMagazine,
   getAllMagazines,
   getMagazineById,
-  deleteMagazine
+  updateMagazine,
+  deleteMagazine,
 };

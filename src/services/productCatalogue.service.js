@@ -13,6 +13,10 @@ export const getProductCatalogueById = async (id) => {
   return await ProductCatalogue.findById(id);
 };
 
+export const updateProductCatalogue = async (id, data) => {
+  return await ProductCatalogue.findByIdAndUpdate(id, data, { new: true });
+};
+
 export const deleteProductCatalogue = async (id) => {
   return await ProductCatalogue.findByIdAndDelete(id);
 };
@@ -21,5 +25,6 @@ export default {
   createProductCatalogue,
   getAllProductCatalogues,
   getProductCatalogueById,
+  updateProductCatalogue,
   deleteProductCatalogue,
 };

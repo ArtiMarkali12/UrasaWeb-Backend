@@ -79,9 +79,37 @@ export const deletePamphlet = async (req, res) => {
   }
 };
 
+export const updatePamphlet = async (req, res) => {
+  try {
+    const data = req.body;
+
+    const pamphlet = await pamphletService.updatePamphlet(req.params.id, data);
+
+    if (!pamphlet) {
+      return res.status(404).json({
+        success: false,
+        message: "Pamphlet quote not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Pamphlet quote updated successfully",
+      data: pamphlet,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating pamphlet quote",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createPamphletQuote,
   getAllPamphlets,
   getPamphletById,
+  updatePamphlet,
   deletePamphlet,
 };

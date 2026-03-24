@@ -82,9 +82,38 @@ export const deleteProductCatalogue = async (req, res) => {
   }
 };
 
+export const updateProductCatalogue = async (req, res) => {
+  try {
+    const data = req.body;
+
+    const productCatalogue =
+      await productCatalogueService.updateProductCatalogue(req.params.id, data);
+
+    if (!productCatalogue) {
+      return res.status(404).json({
+        success: false,
+        message: "Product catalogue quote not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product catalogue quote updated successfully",
+      data: productCatalogue,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating product catalogue quote",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createProductCatalogueQuote,
   getAllProductCatalogues,
   getProductCatalogueById,
+  updateProductCatalogue,
   deleteProductCatalogue,
 };

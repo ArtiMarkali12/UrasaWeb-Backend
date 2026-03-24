@@ -5,91 +5,63 @@ import pamphletController from "../controllers/pamphlet.controller.js";
 import pamphletOptionsController from "../controllers/pamphletOptions.controller.js";
 import validatePamphletQuote from "../validators/pamphlet.validator.js";
 
-/* ---------------- Pamphlet CRUD APIs ---------------- */
+/* ---------------- Pamphlet Quote CRUD APIs ---------------- */
 
 router.post("/", validatePamphletQuote, pamphletController.createPamphletQuote);
 
 router.get("/", pamphletController.getAllPamphlets);
 
 /* ---------------- Pamphlet Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
-router.get("/options", pamphletOptionsController.getAllPamphletOptions);
+router.get("/options", pamphletOptionsController.getAllOptions);
 
-/* POST APIs - Add Option Values */
-router.post("/format-and-folding-styles", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(
-    req,
-    res,
-    "formatAndFoldingStyles",
-  ),
+/* Category Management (Main Categories) */
+router.post("/category", pamphletOptionsController.addCategory);
+router.delete("/category", pamphletOptionsController.deleteCategory);
+
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  pamphletOptionsController.addSubcategory,
 );
-router.post("/sizes", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(req, res, "sizes"),
-);
-router.post("/paper-weights", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(req, res, "paperWeights"),
-);
-router.post("/paper-types", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(req, res, "paperTypes"),
-);
-router.post("/printed-sides", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(req, res, "printedSides"),
-);
-router.post("/laminations", (req, res) =>
-  pamphletOptionsController.addPamphletOptionValue(req, res, "laminations"),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  pamphletOptionsController.deleteSubcategory,
 );
 
-/* PUT APIs - Update Option Values */
-router.put("/format-and-folding-styles/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(
-    req,
-    res,
-    "formatAndFoldingStyles",
-  ),
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  pamphletOptionsController.addAttribute,
 );
-router.put("/sizes/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(req, res, "sizes"),
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  pamphletOptionsController.updateAttribute,
 );
-router.put("/paper-weights/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(req, res, "paperWeights"),
-);
-router.put("/paper-types/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(req, res, "paperTypes"),
-);
-router.put("/printed-sides/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(req, res, "printedSides"),
-);
-router.put("/laminations/:index", (req, res) =>
-  pamphletOptionsController.updatePamphletOptionValue(req, res, "laminations"),
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  pamphletOptionsController.deleteAttribute,
 );
 
-/* DELETE APIs - Delete Option Values */
-router.delete("/format-and-folding-styles/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(
-    req,
-    res,
-    "formatAndFoldingStyles",
-  ),
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  pamphletOptionsController.addCategoryAttribute,
 );
-router.delete("/sizes/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(req, res, "sizes"),
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  pamphletOptionsController.updateCategoryAttribute,
 );
-router.delete("/paper-weights/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(req, res, "paperWeights"),
-);
-router.delete("/paper-types/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(req, res, "paperTypes"),
-);
-router.delete("/printed-sides/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(req, res, "printedSides"),
-);
-router.delete("/laminations/:index", (req, res) =>
-  pamphletOptionsController.deletePamphletOptionValue(req, res, "laminations"),
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  pamphletOptionsController.deleteCategoryAttribute,
 );
 
-/* ---------------- Pamphlet ID-based APIs (must be last) ---------------- */
-
+/* Pamphlet by ID - Must be after /options */
 router.get("/:id", pamphletController.getPamphletById);
+
+router.put("/:id", pamphletController.updatePamphlet);
 
 router.delete("/:id", pamphletController.deletePamphlet);
 

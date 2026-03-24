@@ -5,7 +5,7 @@ export const createArtbook = async (req, res) => {
     const data = req.body;
 
     if (req.files) {
-      data.files = req.files.map(file => file.path);
+      data.files = req.files.map((file) => file.path);
     }
 
     const artbook = await artbookService.createArtbook(data);
@@ -13,14 +13,13 @@ export const createArtbook = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Artbook is created successfully",
-      data: artbook
+      data: artbook,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error creating artbook",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -31,13 +30,12 @@ export const getAllArtbooks = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: artbooks
+      data: artbooks,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching artbooks"
+      message: "Error fetching artbooks",
     });
   }
 };
@@ -49,19 +47,18 @@ export const getArtbookById = async (req, res) => {
     if (!artbook) {
       return res.status(404).json({
         success: false,
-        message: "Artbook not found"
+        message: "Artbook not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: artbook
+      data: artbook,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching artbook"
+      message: "Error fetching artbook",
     });
   }
 };
@@ -72,13 +69,12 @@ export const deleteArtbook = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Artbook deleted successfully"
+      message: "Artbook deleted successfully",
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting artbook"
+      message: "Error deleting artbook",
     });
   }
 };
@@ -87,5 +83,5 @@ export default {
   createArtbook,
   getAllArtbooks,
   getArtbookById,
-  deleteArtbook
+  deleteArtbook,
 };

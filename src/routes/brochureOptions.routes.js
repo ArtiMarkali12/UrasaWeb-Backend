@@ -1,52 +1,52 @@
 import express from "express";
 const router = express.Router();
 
-import artbookOptionsController from "../controllers/artbookOptions.controller.js";
+import brochureOptionsController from "../controllers/brochureOptions.controller.js";
 
-/* ---------------- Artbook Options APIs ---------------- */
+/* ---------------- Brochure Options APIs ---------------- */
 
-router.get("/", artbookOptionsController.getAllArtbookOptions);
+router.get("/", brochureOptionsController.getAllBrochureOptions);
 
 /* Category Management (Main Categories) */
-router.post("/category", artbookOptionsController.addCategory);
-router.delete("/category", artbookOptionsController.deleteCategory);
+router.post("/category", brochureOptionsController.addCategory);
+router.delete("/category", brochureOptionsController.deleteCategory);
 
 /* Subcategory Management */
 router.post(
   "/category/:categoryKey/subcategory",
-  artbookOptionsController.addSubcategory,
+  brochureOptionsController.addSubcategory,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
-  artbookOptionsController.deleteSubcategory,
+  brochureOptionsController.deleteSubcategory,
 );
 
 /* Attribute Management */
 router.post(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
-  artbookOptionsController.addAttribute,
+  brochureOptionsController.addAttribute,
 );
 router.put(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  artbookOptionsController.updateAttribute,
+  brochureOptionsController.updateAttribute,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  artbookOptionsController.deleteAttribute,
+  brochureOptionsController.deleteAttribute,
 );
 
 /* Category-level Attribute Management */
 router.post(
   "/category/:categoryKey/attribute",
-  artbookOptionsController.addCategoryAttribute,
+  brochureOptionsController.addCategoryAttribute,
 );
 router.put(
   "/category/:categoryKey/attribute/:index",
-  artbookOptionsController.updateCategoryAttribute,
+  brochureOptionsController.updateCategoryAttribute,
 );
 router.delete(
   "/category/:categoryKey/attribute/:index",
-  artbookOptionsController.deleteCategoryAttribute,
+  brochureOptionsController.deleteCategoryAttribute,
 );
 
 export default router;

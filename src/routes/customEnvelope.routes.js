@@ -5,43 +5,67 @@ import customEnvelopeController from "../controllers/customEnvelope.controller.j
 import customEnvelopeOptionsController from "../controllers/customEnvelopeOptions.controller.js";
 import validateCustomEnvelope from "../validators/customEnvelope.validator.js";
 
-/* ---------------- Custom Envelope CRUD APIs ---------------- */
+/* ---------------- Custom Envelope Quote CRUD APIs ---------------- */
 
-router.post("/", validateCustomEnvelope, customEnvelopeController.createCustomEnvelope);
+router.post(
+  "/",
+  validateCustomEnvelope,
+  customEnvelopeController.createCustomEnvelope,
+);
 
 router.get("/", customEnvelopeController.getAllCustomEnvelopes);
 
 /* ---------------- Custom Envelope Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
-router.get("/options", customEnvelopeOptionsController.getAllCustomEnvelopeOptions);
+router.get("/options", customEnvelopeOptionsController.getAllOptions);
 
-/* POST APIs - Add Option Values */
-router.post("/sizes", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "sizes"));
-router.post("/paper-materials", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "paperMaterials"));
-router.post("/gsm-weights", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "gsmWeights"));
-router.post("/seal-types", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "sealTypes"));
-router.post("/window-options", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "windowOptions"));
-router.post("/print-colors", (req, res) => customEnvelopeOptionsController.addCustomEnvelopeOptionValue(req, res, "printColors"));
+/* Category Management (Main Categories) */
+router.post("/category", customEnvelopeOptionsController.addCategory);
+router.delete("/category", customEnvelopeOptionsController.deleteCategory);
 
-/* PUT APIs - Update Option Values */
-router.put("/sizes/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "sizes"));
-router.put("/paper-materials/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "paperMaterials"));
-router.put("/gsm-weights/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "gsmWeights"));
-router.put("/seal-types/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "sealTypes"));
-router.put("/window-options/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "windowOptions"));
-router.put("/print-colors/:index", (req, res) => customEnvelopeOptionsController.updateCustomEnvelopeOptionValue(req, res, "printColors"));
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  customEnvelopeOptionsController.addSubcategory,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  customEnvelopeOptionsController.deleteSubcategory,
+);
 
-/* DELETE APIs - Delete Option Values */
-router.delete("/sizes/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "sizes"));
-router.delete("/paper-materials/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "paperMaterials"));
-router.delete("/gsm-weights/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "gsmWeights"));
-router.delete("/seal-types/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "sealTypes"));
-router.delete("/window-options/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "windowOptions"));
-router.delete("/print-colors/:index", (req, res) => customEnvelopeOptionsController.deleteCustomEnvelopeOptionValue(req, res, "printColors"));
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  customEnvelopeOptionsController.addAttribute,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  customEnvelopeOptionsController.updateAttribute,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  customEnvelopeOptionsController.deleteAttribute,
+);
 
-/* ---------------- Custom Envelope ID-based APIs (must be last) ---------------- */
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  customEnvelopeOptionsController.addCategoryAttribute,
+);
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  customEnvelopeOptionsController.updateCategoryAttribute,
+);
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  customEnvelopeOptionsController.deleteCategoryAttribute,
+);
 
+/* Custom Envelope by ID - Must be after /options */
 router.get("/:id", customEnvelopeController.getCustomEnvelopeById);
+
+router.put("/:id", customEnvelopeController.updateCustomEnvelope);
 
 router.delete("/:id", customEnvelopeController.deleteCustomEnvelope);
 

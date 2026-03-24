@@ -5,45 +5,60 @@ import artbookController from "../controllers/artbook.controller.js";
 import artbookOptionsController from "../controllers/artbookOptions.controller.js";
 import validateArtbook from "../validators/artbook.validator.js";
 
-/* ---------------- Artbook CRUD APIs ---------------- */
+/* ---------------- Artbook Quote CRUD APIs ---------------- */
 
 router.post("/", validateArtbook, artbookController.createArtbook);
 
 router.get("/", artbookController.getAllArtbooks);
 
-/* ---------------- Artbook Options APIs ---------------- */
+/* ---------------- Options APIs ---------------- */
+/* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
 router.get("/options", artbookOptionsController.getAllArtbookOptions);
 
-/* POST APIs - Add Option Values */
-router.post("/sizes", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "sizes"));
-router.post("/binding-styles", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "bindingStyles"));
-router.post("/number-of-pages", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "numberOfPages"));
-router.post("/paper-types", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "paperTypes"));
-router.post("/paper-weights", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "paperWeights"));
-router.post("/cover-materials", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "coverMaterials"));
-router.post("/features", (req, res) => artbookOptionsController.addArtbookOptionValue(req, res, "features"));
+/* Category Management (Main Categories) */
+router.post("/category", artbookOptionsController.addCategory);
+router.delete("/category", artbookOptionsController.deleteCategory);
 
-/* PUT APIs - Update Option Values */
-router.put("/sizes/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "sizes"));
-router.put("/binding-styles/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "bindingStyles"));
-router.put("/number-of-pages/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "numberOfPages"));
-router.put("/paper-types/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "paperTypes"));
-router.put("/paper-weights/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "paperWeights"));
-router.put("/cover-materials/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "coverMaterials"));
-router.put("/features/:index", (req, res) => artbookOptionsController.updateArtbookOptionValue(req, res, "features"));
+/* Subcategory Management */
+router.post(
+  "/category/:categoryKey/subcategory",
+  artbookOptionsController.addSubcategory,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  artbookOptionsController.deleteSubcategory,
+);
 
-/* DELETE APIs - Delete Option Values */
-router.delete("/sizes/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "sizes"));
-router.delete("/binding-styles/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "bindingStyles"));
-router.delete("/number-of-pages/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "numberOfPages"));
-router.delete("/paper-types/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "paperTypes"));
-router.delete("/paper-weights/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "paperWeights"));
-router.delete("/cover-materials/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "coverMaterials"));
-router.delete("/features/:index", (req, res) => artbookOptionsController.deleteArtbookOptionValue(req, res, "features"));
+/* Attribute Management */
+router.post(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
+  artbookOptionsController.addAttribute,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  artbookOptionsController.updateAttribute,
+);
+router.delete(
+  "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
+  artbookOptionsController.deleteAttribute,
+);
 
-/* ---------------- Artbook ID-based APIs (must be last) ---------------- */
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  artbookOptionsController.addCategoryAttribute,
+);
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  artbookOptionsController.updateCategoryAttribute,
+);
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  artbookOptionsController.deleteCategoryAttribute,
+);
 
+/* Artbook by ID - Must be after /options */
 router.get("/:id", artbookController.getArtbookById);
 
 router.delete("/:id", artbookController.deleteArtbook);

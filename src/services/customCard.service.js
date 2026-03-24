@@ -13,6 +13,10 @@ export const getCustomCardById = async (id) => {
   return await CustomCard.findById(id);
 };
 
+export const updateCustomCard = async (id, data) => {
+  return await CustomCard.findByIdAndUpdate(id, data, { new: true });
+};
+
 export const deleteCustomCard = async (id) => {
   return await CustomCard.findByIdAndDelete(id);
 };
@@ -21,5 +25,6 @@ export default {
   createCustomCard,
   getAllCustomCards,
   getCustomCardById,
-  deleteCustomCard
+  updateCustomCard,
+  deleteCustomCard,
 };

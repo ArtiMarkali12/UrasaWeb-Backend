@@ -1,9 +1,8 @@
-import productCatalogueOptionsService from "../services/productCatalogueOptions.service.js";
+import ProductCatalogueOption from "../models/productCatalogueOptions.model.js";
 
-export const getAllProductCatalogueOptions = async (req, res) => {
+export const getAllOptions = async (req, res) => {
   try {
-    const options =
-      await productCatalogueOptionsService.getAllProductCatalogueOptions();
+    const options = await ProductCatalogueOption.getAllOptions();
 
     res.status(200).json({
       success: true,
@@ -12,47 +11,151 @@ export const getAllProductCatalogueOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching product catalogue options",
+      message: "Error fetching options",
       error: error.message,
     });
   }
 };
 
-export const addProductCatalogueOptionValue = async (req, res, field) => {
+export const addCategory = async (req, res) => {
   try {
-    const { value } = req.body;
+    const { categoryKey } = req.body;
 
-    if (!value) {
+    if (!categoryKey) {
       return res.status(400).json({
         success: false,
-        message: "Value is required",
+        message: "Category key is required",
       });
     }
 
-    const options =
-      await productCatalogueOptionsService.addProductCatalogueOptionValue(
-        field,
-        value,
-      );
+    const options = await ProductCatalogueOption.addCategory(categoryKey);
 
     res.status(201).json({
       success: true,
-      message: `${field} added successfully`,
+      message: `Category "${categoryKey}" added successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error adding product catalogue option",
-      error: error.message,
+      message: error.message,
     });
   }
 };
 
-export const updateProductCatalogueOptionValue = async (req, res, field) => {
+export const addSubcategory = async (req, res) => {
   try {
+    const { categoryKey } = req.params;
+    const { subcategoryKey } = req.body;
+
+    if (!subcategoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Subcategory key is required",
+      });
+    }
+
+    const options = await ProductCatalogueOption.addSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.body;
+
+    if (!categoryKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Category key is required",
+      });
+    }
+
+    const options = await ProductCatalogueOption.deleteCategory(categoryKey);
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" deleted successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteSubcategory = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+
+    const options = await ProductCatalogueOption.deleteSubcategory(
+      categoryKey,
+      subcategoryKey,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const addAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
     const { value } = req.body;
-    const index = parseInt(req.params.index);
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await ProductCatalogueOption.addAttribute(
+      categoryKey,
+      subcategoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${subcategoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateAttribute = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey, index } = req.params;
+    const { value } = req.body;
 
     if (!value) {
       return res.status(400).json({
@@ -61,82 +164,143 @@ export const updateProductCatalogueOptionValue = async (req, res, field) => {
       });
     }
 
-    if (isNaN(index)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid index",
-      });
-    }
-
-    const options =
-      await productCatalogueOptionsService.updateProductCatalogueOptionValue(
-        field,
-        index,
-        value,
-      );
-
-    if (!options) {
-      return res.status(404).json({
-        success: false,
-        message: "Option not found",
-      });
-    }
+    const options = await ProductCatalogueOption.updateAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+      value,
+    );
 
     res.status(200).json({
       success: true,
-      message: `${field} updated successfully`,
+      message: `Attribute updated in "${subcategoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error updating product catalogue option",
-      error: error.message,
+      message: error.message,
     });
   }
 };
 
-export const deleteProductCatalogueOptionValue = async (req, res, field) => {
+export const deleteAttribute = async (req, res) => {
   try {
-    const index = parseInt(req.params.index);
+    const { categoryKey, subcategoryKey, index } = req.params;
 
-    if (isNaN(index)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid index",
-      });
-    }
-
-    const options =
-      await productCatalogueOptionsService.deleteProductCatalogueOptionValue(
-        field,
-        index,
-      );
-
-    if (!options) {
-      return res.status(404).json({
-        success: false,
-        message: "Option not found",
-      });
-    }
+    const options = await ProductCatalogueOption.deleteAttribute(
+      categoryKey,
+      subcategoryKey,
+      parseInt(index),
+    );
 
     res.status(200).json({
       success: true,
-      message: `${field} deleted successfully`,
+      message: `Attribute deleted from "${subcategoryKey}" successfully`,
       data: options,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
-      message: "Error deleting product catalogue option",
-      error: error.message,
+      message: error.message,
+    });
+  }
+};
+
+// Category-level attribute methods
+export const addCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Attribute value is required",
+      });
+    }
+
+    const options = await ProductCatalogueOption.addCategoryAttribute(
+      categoryKey,
+      value,
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Attribute added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+    const { value } = req.body;
+
+    if (!value) {
+      return res.status(400).json({
+        success: false,
+        message: "Value is required",
+      });
+    }
+
+    const options = await ProductCatalogueOption.updateCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+      value,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute updated in "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCategoryAttribute = async (req, res) => {
+  try {
+    const { categoryKey, index } = req.params;
+
+    const options = await ProductCatalogueOption.deleteCategoryAttribute(
+      categoryKey,
+      parseInt(index),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Attribute deleted from "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
   }
 };
 
 export default {
-  getAllProductCatalogueOptions,
-  addProductCatalogueOptionValue,
-  updateProductCatalogueOptionValue,
-  deleteProductCatalogueOptionValue,
+  getAllOptions,
+  addCategory,
+  addSubcategory,
+  deleteCategory,
+  deleteSubcategory,
+  addAttribute,
+  updateAttribute,
+  deleteAttribute,
+  addCategoryAttribute,
+  updateCategoryAttribute,
+  deleteCategoryAttribute,
 };
