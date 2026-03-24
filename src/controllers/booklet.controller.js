@@ -12,7 +12,7 @@ export const createBookletQuote = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Booklet quote created successfully",
+      message: "Booklet quote is created successfully",
       data: booklet,
     });
   } catch (error) {
