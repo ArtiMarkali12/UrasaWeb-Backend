@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 
@@ -45,11 +44,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-/* ---------- Middleware ---------- */
-
-/* app.use(cors());
-app.use(express.json()); */
 
 /* ---------- Routes ---------- */
 
