@@ -45,6 +45,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+/* ---------- Root Route ---------- */
+app.get("/", (req, res) => {
+  res.send("Your Urasa Arts Backend is running");
+});
+
 /* ---------- Routes ---------- */
 
 app.use("/api/booklet-quote", upload.array("files", 10), bookletQuoteRoutes);
