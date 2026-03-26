@@ -36,7 +36,13 @@ const app = express();
 /* ---------- CORS ---------- */
 app.use(
   cors({
-    origin: ["https://urasaweb-admin.onrender.com", "http://localhost:5173"],
+    origin: [
+      "https://urasaweb-admin.onrender.com",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:3000",
+      "http://localhost:5000",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
