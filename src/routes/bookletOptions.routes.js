@@ -3,8 +3,11 @@ import * as bookletOptionsController from "../controllers/bookletOptions.control
 
 const router = express.Router();
 
-// Get all options
+// Get all options (original format)
 router.get("/", bookletOptionsController.getAllOptions);
+
+// Get options in hierarchical format for dropdowns
+router.get("/dropdown", bookletOptionsController.getDropdownOptions);
 
 // Add a new category
 router.post("/category", bookletOptionsController.addCategory);

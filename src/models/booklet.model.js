@@ -85,12 +85,7 @@ const bookletSchema = new mongoose.Schema(
         required: true,
       },
 
-      phone: {
-        type: String,
-        required: true,
-      },
-
-      address: {
+      country: {
         type: String,
       },
     },

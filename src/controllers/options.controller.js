@@ -17,6 +17,46 @@ export const getAllOptions = async (req, res) => {
   }
 };
 
+// Get options in hierarchical format for dropdowns (for frontend)
+export const getDropdownOptions = async (req, res) => {
+  try {
+    const options = await optionsService.getAllOptions();
+
+    // Transform into hierarchical array format for dropdowns
+    const dropdownOptions = Object.keys(options).map((categoryKey) => {
+      const category = options[categoryKey];
+      const subcategories = category.subcategories || {};
+
+      return {
+        categoryKey,
+        categoryName: category.displayName || categoryKey,
+        label: category.displayName || categoryKey,
+        attributes: category.attributes || [],
+        subcategories: Object.keys(subcategories).map((subcatKey) => {
+          const subcat = subcategories[subcatKey];
+          return {
+            subcategoryKey: subcatKey,
+            subcategoryName: subcat.displayName || subcatKey,
+            label: subcat.displayName || subcatKey,
+            attributes: subcat.attributes || [],
+          };
+        }),
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: dropdownOptions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching dropdown options",
+      error: error.message,
+    });
+  }
+};
+
 export const addCategory = async (req, res) => {
   try {
     const { categoryKey, displayName } = req.body;
@@ -210,6 +250,7 @@ export const deleteAttribute = async (req, res) => {
 
 export default {
   getAllOptions,
+  getDropdownOptions,
   addCategory,
   addSubcategory,
   deleteCategory,

@@ -11,7 +11,47 @@ export const getAllOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching options",
+      message: "Error fetching booklet options",
+      error: error.message,
+    });
+  }
+};
+
+// Get options in hierarchical format for dropdowns (for frontend)
+export const getDropdownOptions = async (req, res) => {
+  try {
+    const options = await BookletOption.getAllOptions();
+
+    // Transform into hierarchical format for frontend
+    const dropdownOptions = Object.keys(options).map((categoryKey) => {
+      const category = options[categoryKey];
+      const subcategories = category.subcategories || {};
+
+      return {
+        categoryKey,
+        categoryName: category.displayName || categoryKey,
+        label: category.displayName || categoryKey,
+        attributes: category.attributes || [],
+        subcategories: Object.keys(subcategories).map((subcatKey) => {
+          const subcat = subcategories[subcatKey];
+          return {
+            subcategoryKey: subcatKey,
+            subcategoryName: subcat.displayName || subcatKey,
+            label: subcat.displayName || subcatKey,
+            attributes: subcat.attributes || [],
+          };
+        }),
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: dropdownOptions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching booklet dropdown options",
       error: error.message,
     });
   }
@@ -19,7 +59,8 @@ export const getAllOptions = async (req, res) => {
 
 export const addCategory = async (req, res) => {
   try {
-    const { categoryKey } = req.body;
+    const { categoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!categoryKey) {
       return res.status(400).json({
@@ -28,7 +69,13 @@ export const addCategory = async (req, res) => {
       });
     }
 
-    const options = await BookletOption.addCategory(categoryKey);
+    const options = await BookletOption.addCategory(
+      categoryKey,
+      displayName || categoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
+    );
 
     res.status(201).json({
       success: true,
@@ -46,7 +93,8 @@ export const addCategory = async (req, res) => {
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
-    const { subcategoryKey } = req.body;
+    const { subcategoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!subcategoryKey) {
       return res.status(400).json({
@@ -58,11 +106,40 @@ export const addSubcategory = async (req, res) => {
     const options = await BookletOption.addSubcategory(
       categoryKey,
       subcategoryKey,
+      displayName || subcategoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
     );
 
     res.status(201).json({
       success: true,
       message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update subcategory field configuration
+export const updateSubcategoryField = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+    const { fieldType, placeholder, required, displayName } = req.body;
+
+    const options = await BookletOption.updateSubcategoryField(
+      categoryKey,
+      subcategoryKey,
+      { fieldType, placeholder, required, displayName },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" field configuration updated successfully`,
       data: options,
     });
   } catch (error) {
@@ -293,8 +370,10 @@ export const deleteCategoryAttribute = async (req, res) => {
 
 export default {
   getAllOptions,
+  getDropdownOptions,
   addCategory,
   addSubcategory,
+  updateSubcategoryField,
   deleteCategory,
   deleteSubcategory,
   addAttribute,

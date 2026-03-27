@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 import bookletController from "../controllers/booklet.controller.js";
-import optionsController from "../controllers/options.controller.js";
+import bookletOptionsController from "../controllers/bookletOptions.controller.js";
 import validateBookletQuote from "../validators/bookletQuote.validator.js";
 
 /* ---------------- Booklet Quote CRUD APIs ---------------- */
@@ -11,37 +11,60 @@ router.post("/", validateBookletQuote, bookletController.createBookletQuote);
 
 router.get("/", bookletController.getAllQuotes);
 
-/* ---------------- Options APIs ---------------- */
+/* ---------------- Booklet Options APIs ---------------- */
 /* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
-router.get("/options", optionsController.getAllOptions);
+router.get("/options", bookletOptionsController.getAllOptions);
+
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", bookletOptionsController.getDropdownOptions);
 
 /* Category Management (Main Categories) */
-router.post("/category", optionsController.addCategory);
-router.delete("/category", optionsController.deleteCategory);
+router.post("/category", bookletOptionsController.addCategory);
+router.delete("/category", bookletOptionsController.deleteCategory);
 
 /* Subcategory Management */
 router.post(
   "/category/:categoryKey/subcategory",
-  optionsController.addSubcategory,
+  bookletOptionsController.addSubcategory,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
-  optionsController.deleteSubcategory,
+  bookletOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  bookletOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
 router.post(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
-  optionsController.addAttribute,
+  bookletOptionsController.addAttribute,
 );
 router.put(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  optionsController.updateAttribute,
+  bookletOptionsController.updateAttribute,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  optionsController.deleteAttribute,
+  bookletOptionsController.deleteAttribute,
+);
+
+/* Category-level Attribute Management */
+router.post(
+  "/category/:categoryKey/attribute",
+  bookletOptionsController.addCategoryAttribute,
+);
+router.put(
+  "/category/:categoryKey/attribute/:index",
+  bookletOptionsController.updateCategoryAttribute,
+);
+router.delete(
+  "/category/:categoryKey/attribute/:index",
+  bookletOptionsController.deleteCategoryAttribute,
 );
 
 router.get("/:id", bookletController.getBookletById);
