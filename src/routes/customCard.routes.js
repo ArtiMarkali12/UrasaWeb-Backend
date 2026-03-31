@@ -16,8 +16,15 @@ router.get("/", customCardController.getAllCustomCards);
 
 router.get("/options", customCardOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", customCardOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", customCardOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  customCardOptionsController.updateCategory,
+);
 router.delete("/category", customCardOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -28,6 +35,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   customCardOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  customCardOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
@@ -56,6 +69,16 @@ router.put(
 router.delete(
   "/category/:categoryKey/attribute/:index",
   customCardOptionsController.deleteCategoryAttribute,
+);
+
+/* Card Types Management (Carousel) */
+router.get("/card-types", customCardOptionsController.getAllCardTypes);
+router.post("/card-types", customCardOptionsController.addCardType);
+router.put("/card-types/:index", customCardOptionsController.updateCardType);
+router.delete("/card-types/:index", customCardOptionsController.deleteCardType);
+router.post(
+  "/card-types/reorder",
+  customCardOptionsController.reorderCardTypes,
 );
 
 /* Custom Card by ID - Must be after /options */

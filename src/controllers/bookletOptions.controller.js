@@ -90,6 +90,32 @@ export const addCategory = async (req, res) => {
   }
 };
 
+// Update category field configuration
+export const updateCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { displayName, fieldType, placeholder, required } = req.body;
+
+    const options = await BookletOption.updateCategory(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" updated successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
@@ -372,9 +398,10 @@ export default {
   getAllOptions,
   getDropdownOptions,
   addCategory,
+  updateCategory,
+  deleteCategory,
   addSubcategory,
   updateSubcategoryField,
-  deleteCategory,
   deleteSubcategory,
   addAttribute,
   updateAttribute,

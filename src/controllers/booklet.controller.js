@@ -18,7 +18,7 @@ export const createBookletQuote = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error creating booklet quote",
+      message: "Error creating booklet quote: " + error.message,
       error: error.message,
     });
   }

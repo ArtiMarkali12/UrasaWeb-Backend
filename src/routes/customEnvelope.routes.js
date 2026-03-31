@@ -20,8 +20,18 @@ router.get("/", customEnvelopeController.getAllCustomEnvelopes);
 
 router.get("/options", customEnvelopeOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get(
+  "/options/dropdown",
+  customEnvelopeOptionsController.getDropdownOptions,
+);
+
 /* Category Management (Main Categories) */
 router.post("/category", customEnvelopeOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  customEnvelopeOptionsController.updateCategory,
+);
 router.delete("/category", customEnvelopeOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -32,6 +42,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   customEnvelopeOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  customEnvelopeOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

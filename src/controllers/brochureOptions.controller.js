@@ -11,7 +11,47 @@ export const getAllBrochureOptions = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching options",
+      message: "Error fetching brochure options",
+      error: error.message,
+    });
+  }
+};
+
+// Get options in hierarchical format for dropdowns (for frontend)
+export const getDropdownOptions = async (req, res) => {
+  try {
+    const options = await BrochureOption.getAllOptions();
+
+    // Transform into hierarchical format for frontend
+    const dropdownOptions = Object.keys(options).map((categoryKey) => {
+      const category = options[categoryKey];
+      const subcategories = category.subcategories || {};
+
+      return {
+        categoryKey,
+        categoryName: category.displayName || categoryKey,
+        label: category.displayName || categoryKey,
+        attributes: category.attributes || [],
+        subcategories: Object.keys(subcategories).map((subcatKey) => {
+          const subcat = subcategories[subcatKey];
+          return {
+            subcategoryKey: subcatKey,
+            subcategoryName: subcat.displayName || subcatKey,
+            label: subcat.displayName || subcatKey,
+            attributes: subcat.attributes || [],
+          };
+        }),
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: dropdownOptions,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching brochure dropdown options",
       error: error.message,
     });
   }
@@ -19,7 +59,8 @@ export const getAllBrochureOptions = async (req, res) => {
 
 export const addCategory = async (req, res) => {
   try {
-    const { categoryKey } = req.body;
+    const { categoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!categoryKey) {
       return res.status(400).json({
@@ -28,7 +69,13 @@ export const addCategory = async (req, res) => {
       });
     }
 
-    const options = await BrochureOption.addCategory(categoryKey);
+    const options = await BrochureOption.addCategory(
+      categoryKey,
+      displayName || categoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
+    );
 
     res.status(201).json({
       success: true,
@@ -43,10 +90,37 @@ export const addCategory = async (req, res) => {
   }
 };
 
+// Update category field configuration
+export const updateCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { displayName, fieldType, placeholder, required } = req.body;
+
+    const options = await BrochureOption.updateCategory(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" updated successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
-    const { subcategoryKey } = req.body;
+    const { subcategoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!subcategoryKey) {
       return res.status(400).json({
@@ -58,11 +132,40 @@ export const addSubcategory = async (req, res) => {
     const options = await BrochureOption.addSubcategory(
       categoryKey,
       subcategoryKey,
+      displayName || subcategoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
     );
 
     res.status(201).json({
       success: true,
       message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update subcategory field configuration
+export const updateSubcategoryField = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+    const { fieldType, placeholder, required, displayName } = req.body;
+
+    const options = await BrochureOption.updateSubcategoryField(
+      categoryKey,
+      subcategoryKey,
+      { fieldType, placeholder, required, displayName },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" field configuration updated successfully`,
       data: options,
     });
   } catch (error) {
@@ -291,142 +394,14 @@ export const deleteCategoryAttribute = async (req, res) => {
   }
 };
 
-// Helper methods for route handlers
-export const addBrochureOptionValue = async (req, res, optionType) => {
-  try {
-    const { value } = req.body;
-
-    if (!value) {
-      return res.status(400).json({
-        success: false,
-        message: "Value is required",
-      });
-    }
-
-    const categoryMap = {
-      foldStyles: "foldStyles",
-      sizes: "sizes",
-      paperStocks: "paperStocks",
-      finishingTypes: "finishingTypes",
-    };
-
-    const categoryKey = categoryMap[optionType];
-
-    if (!categoryKey) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid option type",
-      });
-    }
-
-    const options = await BrochureOption.addCategoryAttribute(
-      categoryKey,
-      value,
-    );
-
-    res.status(201).json({
-      success: true,
-      message: `${optionType} value added successfully`,
-      data: options,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-export const updateBrochureOptionValue = async (req, res, optionType) => {
-  try {
-    const { index } = req.params;
-    const { value } = req.body;
-
-    if (!value) {
-      return res.status(400).json({
-        success: false,
-        message: "Value is required",
-      });
-    }
-
-    const categoryMap = {
-      foldStyles: "foldStyles",
-      sizes: "sizes",
-      paperStocks: "paperStocks",
-      finishingTypes: "finishingTypes",
-    };
-
-    const categoryKey = categoryMap[optionType];
-
-    if (!categoryKey) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid option type",
-      });
-    }
-
-    const options = await BrochureOption.updateCategoryAttribute(
-      categoryKey,
-      parseInt(index),
-      value,
-    );
-
-    res.status(200).json({
-      success: true,
-      message: `${optionType} value updated successfully`,
-      data: options,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-export const deleteBrochureOptionValue = async (req, res, optionType) => {
-  try {
-    const { index } = req.params;
-
-    const categoryMap = {
-      foldStyles: "foldStyles",
-      sizes: "sizes",
-      paperStocks: "paperStocks",
-      finishingTypes: "finishingTypes",
-    };
-
-    const categoryKey = categoryMap[optionType];
-
-    if (!categoryKey) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid option type",
-      });
-    }
-
-    const options = await BrochureOption.deleteCategoryAttribute(
-      categoryKey,
-      parseInt(index),
-    );
-
-    res.status(200).json({
-      success: true,
-      message: `${optionType} value deleted successfully`,
-      data: options,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 export default {
   getAllBrochureOptions,
+  getDropdownOptions,
   addCategory,
-  addSubcategory,
+  updateCategory,
   deleteCategory,
+  addSubcategory,
+  updateSubcategoryField,
   deleteSubcategory,
   addAttribute,
   updateAttribute,
@@ -434,7 +409,4 @@ export default {
   addCategoryAttribute,
   updateCategoryAttribute,
   deleteCategoryAttribute,
-  addBrochureOptionValue,
-  updateBrochureOptionValue,
-  deleteBrochureOptionValue,
 };

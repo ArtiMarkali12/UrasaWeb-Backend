@@ -1,11 +1,36 @@
 import mongoose from "mongoose";
 
-// Schema for subcategories containing attributes
+// Schema for subcategories containing attributes with field type configuration
 const subcategorySchema = new mongoose.Schema(
   {
+    displayName: {
+      type: String,
+      default: "",
+    },
+    fieldType: {
+      type: String,
+      enum: [
+        "select",
+        "checkbox",
+        "boolean",
+        "number",
+        "text",
+        "textarea",
+        "radio",
+      ],
+      default: "select",
+    },
     attributes: {
       type: [String],
       default: [],
+    },
+    placeholder: {
+      type: String,
+      default: "",
+    },
+    required: {
+      type: Boolean,
+      default: false,
     },
   },
   { _id: false },
@@ -14,6 +39,31 @@ const subcategorySchema = new mongoose.Schema(
 // Schema for main categories containing subcategories and direct attributes
 const categorySchema = new mongoose.Schema(
   {
+    displayName: {
+      type: String,
+      default: "",
+    },
+    fieldType: {
+      type: String,
+      enum: [
+        "select",
+        "checkbox",
+        "boolean",
+        "number",
+        "text",
+        "textarea",
+        "radio",
+      ],
+      default: "select",
+    },
+    placeholder: {
+      type: String,
+      default: "",
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
     subcategories: {
       type: Map,
       of: subcategorySchema,
@@ -27,6 +77,34 @@ const categorySchema = new mongoose.Schema(
   { _id: false },
 );
 
+// Schema for card type items in the carousel
+const cardTypeItemSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: String,
+      required: true,
+    },
+    shape: {
+      type: String,
+      required: true,
+    },
+    metadata: {
+      type: Map,
+      of: String,
+      default: new Map(),
+    },
+  },
+  { _id: false },
+);
+
 const CustomCardOptionSchema = new mongoose.Schema(
   {
     // Hierarchical categories structure
@@ -34,6 +112,11 @@ const CustomCardOptionSchema = new mongoose.Schema(
       type: Map,
       of: categorySchema,
       default: new Map(),
+    },
+    // Card types for carousel selection
+    cardTypes: {
+      type: [cardTypeItemSchema],
+      default: [],
     },
   },
   { timestamps: true },
@@ -54,6 +137,10 @@ CustomCardOptionSchema.statics.getAllOptions = async function () {
   if (options.categories) {
     options.categories.forEach((categoryData, categoryKey) => {
       result[categoryKey] = {
+        displayName: categoryData.displayName || categoryKey,
+        fieldType: categoryData.fieldType || "select",
+        placeholder: categoryData.placeholder || "",
+        required: categoryData.required || false,
         attributes: categoryData.attributes || [],
         subcategories: {},
       };
@@ -61,6 +148,10 @@ CustomCardOptionSchema.statics.getAllOptions = async function () {
       if (categoryData.subcategories) {
         categoryData.subcategories.forEach((subcatData, subcatKey) => {
           result[categoryKey].subcategories[subcatKey] = {
+            displayName: subcatData.displayName || subcatKey,
+            fieldType: subcatData.fieldType || "select",
+            placeholder: subcatData.placeholder || "",
+            required: subcatData.required || false,
             attributes: subcatData.attributes || [],
           };
         });
@@ -72,12 +163,29 @@ CustomCardOptionSchema.statics.getAllOptions = async function () {
 };
 
 // Static method to add a new main category
-CustomCardOptionSchema.statics.addCategory = async function (categoryKey) {
+CustomCardOptionSchema.statics.addCategory = async function (
+  categoryKey,
+  displayName,
+  fieldType = "select",
+  placeholder = "",
+  required = false,
+) {
   let options = await this.findOne();
 
   if (!options) {
     options = await this.create({
-      categories: new Map([[categoryKey, { subcategories: new Map() }]]),
+      categories: new Map([
+        [
+          categoryKey,
+          {
+            displayName,
+            fieldType,
+            placeholder,
+            required,
+            subcategories: new Map(),
+          },
+        ],
+      ]),
     });
   } else {
     if (!options.categories) {
@@ -89,6 +197,10 @@ CustomCardOptionSchema.statics.addCategory = async function (categoryKey) {
     }
 
     options.categories.set(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
       subcategories: new Map(),
     });
     options.markModified("categories");
@@ -98,10 +210,52 @@ CustomCardOptionSchema.statics.addCategory = async function (categoryKey) {
   return options;
 };
 
+// Static method to update a category
+CustomCardOptionSchema.statics.updateCategory = async function (
+  categoryKey,
+  updates,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+
+  // Update fields if provided
+  if (updates.displayName) {
+    category.displayName = updates.displayName;
+  }
+  if (updates.fieldType) {
+    category.fieldType = updates.fieldType;
+  }
+  if (updates.placeholder !== undefined) {
+    category.placeholder = updates.placeholder;
+  }
+  if (updates.required !== undefined) {
+    category.required = updates.required;
+  }
+
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
 // Static method to add a subcategory under a category
 CustomCardOptionSchema.statics.addSubcategory = async function (
   categoryKey,
   subcategoryKey,
+  displayName,
+  fieldType = "select",
+  placeholder = "",
+  required = false,
 ) {
   let options = await this.findOne();
 
@@ -124,7 +278,58 @@ CustomCardOptionSchema.statics.addSubcategory = async function (
     );
   }
 
-  category.subcategories.set(subcategoryKey, { attributes: [] });
+  category.subcategories.set(subcategoryKey, {
+    displayName: displayName || subcategoryKey,
+    fieldType,
+    placeholder,
+    required,
+    attributes: [],
+  });
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
+// Static method to update subcategory field configuration
+CustomCardOptionSchema.statics.updateSubcategoryField = async function (
+  categoryKey,
+  subcategoryKey,
+  fieldConfig,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+  if (!category.subcategories || !category.subcategories.has(subcategoryKey)) {
+    throw new Error(`Subcategory "${subcategoryKey}" does not exist`);
+  }
+
+  const subcategory = category.subcategories.get(subcategoryKey);
+
+  // Update field configuration
+  if (fieldConfig.fieldType) {
+    subcategory.fieldType = fieldConfig.fieldType;
+  }
+  if (fieldConfig.placeholder !== undefined) {
+    subcategory.placeholder = fieldConfig.placeholder;
+  }
+  if (fieldConfig.required !== undefined) {
+    subcategory.required = fieldConfig.required;
+  }
+  if (fieldConfig.displayName) {
+    subcategory.displayName = fieldConfig.displayName;
+  }
+
+  category.subcategories.set(subcategoryKey, subcategory);
   options.categories.set(categoryKey, category);
   options.markModified("categories");
   await options.save();
@@ -403,6 +608,143 @@ CustomCardOptionSchema.statics.deleteCategoryAttribute = async function (
   category.attributes.splice(index, 1);
   options.categories.set(categoryKey, category);
   options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
+// Static method to get options in hierarchical format for dropdowns
+CustomCardOptionSchema.statics.getDropdownOptions = async function () {
+  const options = await this.getAllOptions();
+
+  // Transform into hierarchical format for frontend
+  const dropdownOptions = Object.keys(options).map((categoryKey) => {
+    const category = options[categoryKey];
+    const subcategories = category.subcategories || {};
+
+    return {
+      categoryKey,
+      categoryName: category.displayName || categoryKey,
+      label: category.displayName || categoryKey,
+      attributes: category.attributes || [],
+      subcategories: Object.keys(subcategories).map((subcatKey) => {
+        const subcat = subcategories[subcatKey];
+        return {
+          subcategoryKey: subcatKey,
+          subcategoryName: subcat.displayName || subcatKey,
+          label: subcat.displayName || subcatKey,
+          attributes: subcat.attributes || [],
+        };
+      }),
+    };
+  });
+
+  return dropdownOptions;
+};
+
+// ==================== Card Types Management Methods ====================
+
+// Static method to get all card types
+CustomCardOptionSchema.statics.getAllCardTypes = async function () {
+  let options = await this.findOne();
+
+  if (!options) {
+    options = await this.create({
+      categories: new Map(),
+      cardTypes: [],
+    });
+  }
+
+  return options.cardTypes || [];
+};
+
+// Static method to add a new card type
+CustomCardOptionSchema.statics.addCardType = async function (cardTypeData) {
+  let options = await this.findOne();
+
+  if (!options) {
+    options = await this.create({
+      categories: new Map(),
+      cardTypes: [cardTypeData],
+    });
+  } else {
+    if (!options.cardTypes) {
+      options.cardTypes = [];
+    }
+
+    options.cardTypes.push(cardTypeData);
+    options.markModified("cardTypes");
+    await options.save();
+  }
+
+  return options;
+};
+
+// Static method to update a card type
+CustomCardOptionSchema.statics.updateCardType = async function (
+  index,
+  cardTypeData,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.cardTypes || index < 0 || index >= options.cardTypes.length) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  options.cardTypes[index] = cardTypeData;
+  options.markModified("cardTypes");
+  await options.save();
+
+  return options;
+};
+
+// Static method to delete a card type
+CustomCardOptionSchema.statics.deleteCardType = async function (index) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.cardTypes || index < 0 || index >= options.cardTypes.length) {
+    throw new Error(`Invalid index: ${index}`);
+  }
+
+  options.cardTypes.splice(index, 1);
+  options.markModified("cardTypes");
+  await options.save();
+
+  return options;
+};
+
+// Static method to reorder card types (for carousel)
+CustomCardOptionSchema.statics.reorderCardTypes = async function (
+  fromIndex,
+  toIndex,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (
+    !options.cardTypes ||
+    fromIndex < 0 ||
+    fromIndex >= options.cardTypes.length ||
+    toIndex < 0 ||
+    toIndex >= options.cardTypes.length
+  ) {
+    throw new Error(`Invalid index`);
+  }
+
+  const item = options.cardTypes.splice(fromIndex, 1)[0];
+  options.cardTypes.splice(toIndex, 0, item);
+  options.markModified("cardTypes");
   await options.save();
 
   return options;

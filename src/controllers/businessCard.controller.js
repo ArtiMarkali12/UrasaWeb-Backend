@@ -81,9 +81,44 @@ export const deleteBusinessCard = async (req, res) => {
   }
 };
 
+export const updateBusinessCard = async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (req.files && req.files.length > 0) {
+      data.files = req.files.map((file) => file.path);
+    }
+
+    const businessCard = await businessCardService.updateBusinessCard(
+      req.params.id,
+      data,
+    );
+
+    if (!businessCard) {
+      return res.status(404).json({
+        success: false,
+        message: "Business card not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Business card updated successfully",
+      data: businessCard,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating business card",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   createBusinessCard,
   getAllBusinessCards,
   getBusinessCardById,
   deleteBusinessCard,
+  updateBusinessCard,
 };

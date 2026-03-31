@@ -15,8 +15,12 @@ router.get("/", magazineController.getAllQuotes);
 
 router.get("/options", magazineOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", magazineOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", magazineOptionsController.addCategory);
+router.put("/category/:categoryKey", magazineOptionsController.updateCategory);
 router.delete("/category", magazineOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -27,6 +31,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   magazineOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  magazineOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

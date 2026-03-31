@@ -17,9 +17,17 @@ export const deleteBusinessCard = async (id) => {
   return await BusinessCard.findByIdAndDelete(id);
 };
 
+export const updateBusinessCard = async (id, data) => {
+  return await BusinessCard.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+};
+
 export default {
   createBusinessCard,
   getAllBusinessCards,
   getBusinessCardById,
-  deleteBusinessCard
+  deleteBusinessCard,
+  updateBusinessCard,
 };

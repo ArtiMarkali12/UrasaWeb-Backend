@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 import notebookController from "../controllers/notebook.controller.js";
-import optionsController from "../controllers/notebookOptions.controller.js";
+import notebookOptionsController from "../controllers/notebookOptions.controller.js";
 import validateNotebookQuote from "../validators/notebookQuote.validator.js";
 
 /* ---------------- Notebook Quote CRUD APIs ---------------- */
@@ -14,52 +14,60 @@ router.get("/", notebookController.getAllNotebooks);
 /* ---------------- Options APIs ---------------- */
 /* IMPORTANT: /options must be before /:id or it will be caught by /:id */
 
-router.get("/options", optionsController.getAllOptions);
+router.get("/options", notebookOptionsController.getAllOptions);
+
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", notebookOptionsController.getDropdownOptions);
 
 /* Category Management (Main Categories) */
-router.post("/category", optionsController.addCategory);
-router.delete("/category", optionsController.deleteCategory);
+router.post("/category", notebookOptionsController.addCategory);
+router.delete("/category", notebookOptionsController.deleteCategory);
 
 /* Subcategory Management */
 router.post(
   "/category/:categoryKey/subcategory",
-  optionsController.addSubcategory,
+  notebookOptionsController.addSubcategory,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
-  optionsController.deleteSubcategory,
+  notebookOptionsController.deleteSubcategory,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  notebookOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
 router.post(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute",
-  optionsController.addAttribute,
+  notebookOptionsController.addAttribute,
 );
 router.put(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  optionsController.updateAttribute,
+  notebookOptionsController.updateAttribute,
 );
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey/attribute/:index",
-  optionsController.deleteAttribute,
+  notebookOptionsController.deleteAttribute,
 );
 
 /* Category-level Attribute Management */
 router.post(
   "/category/:categoryKey/attribute",
-  optionsController.addCategoryAttribute,
+  notebookOptionsController.addCategoryAttribute,
 );
 router.put(
   "/category/:categoryKey/attribute/:index",
-  optionsController.updateCategoryAttribute,
+  notebookOptionsController.updateCategoryAttribute,
 );
 router.delete(
   "/category/:categoryKey/attribute/:index",
-  optionsController.deleteCategoryAttribute,
+  notebookOptionsController.deleteCategoryAttribute,
 );
 
-/* Notebook by ID - Must be after /options */
 router.get("/:id", notebookController.getNotebookById);
+
+router.put("/:id", notebookController.updateNotebook);
 
 router.delete("/:id", notebookController.deleteNotebook);
 

@@ -2,6 +2,21 @@ import mongoose from "mongoose";
 
 const customCardSchema = new mongoose.Schema(
   {
+    cardTypeSelection: {
+      cardTypeId: {
+        type: String,
+      },
+      cardTypeLabel: {
+        type: String,
+      },
+      size: {
+        type: String,
+      },
+      shape: {
+        type: String,
+      },
+    },
+
     selectCardTypeAndSize: {
       selectCard: {
         type: String,

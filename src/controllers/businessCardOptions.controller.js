@@ -17,9 +17,28 @@ export const getAllBusinessCardOptions = async (req, res) => {
   }
 };
 
+// Get options in hierarchical format for dropdowns (for frontend)
+export const getDropdownOptions = async (req, res) => {
+  try {
+    const options = await BusinessCardOption.getDropdownOptions();
+
+    res.status(200).json({
+      success: true,
+      data: options,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching business card dropdown options",
+      error: error.message,
+    });
+  }
+};
+
 export const addCategory = async (req, res) => {
   try {
-    const { categoryKey } = req.body;
+    const { categoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!categoryKey) {
       return res.status(400).json({
@@ -28,7 +47,13 @@ export const addCategory = async (req, res) => {
       });
     }
 
-    const options = await BusinessCardOption.addCategory(categoryKey);
+    const options = await BusinessCardOption.addCategory(
+      categoryKey,
+      displayName || categoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
+    );
 
     res.status(201).json({
       success: true,
@@ -46,7 +71,8 @@ export const addCategory = async (req, res) => {
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
-    const { subcategoryKey } = req.body;
+    const { subcategoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!subcategoryKey) {
       return res.status(400).json({
@@ -58,11 +84,66 @@ export const addSubcategory = async (req, res) => {
     const options = await BusinessCardOption.addSubcategory(
       categoryKey,
       subcategoryKey,
+      displayName || subcategoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
     );
 
     res.status(201).json({
       success: true,
       message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update category field configuration
+export const updateCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { displayName, fieldType, placeholder, required } = req.body;
+
+    const options = await BusinessCardOption.updateCategory(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" updated successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update subcategory field configuration
+export const updateSubcategoryField = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+    const { fieldType, placeholder, required, displayName } = req.body;
+
+    const options = await BusinessCardOption.updateSubcategoryField(
+      categoryKey,
+      subcategoryKey,
+      { fieldType, placeholder, required, displayName },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" field configuration updated successfully`,
       data: options,
     });
   } catch (error) {
@@ -436,9 +517,12 @@ export const deleteBusinessCardOptionValue = async (req, res, optionType) => {
 
 export default {
   getAllBusinessCardOptions,
+  getDropdownOptions,
   addCategory,
-  addSubcategory,
+  updateCategory,
   deleteCategory,
+  addSubcategory,
+  updateSubcategoryField,
   deleteSubcategory,
   addAttribute,
   updateAttribute,

@@ -69,12 +69,7 @@ const validateBrochureQuote = (req, res, next) => {
     });
   }
 
-  if (!customerDetails.phone) {
-    return res.status(400).json({
-      success: false,
-      message: "Customer phone is required",
-    });
-  }
+  // Phone is now optional - removed validation
 
   // Validate timeline dates if provided
   if (req.body.timeline) {

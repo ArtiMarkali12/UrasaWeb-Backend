@@ -14,7 +14,7 @@ export const createNotebookQuote = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Notebook quote created successfully",
+      message: "Notebook quote is created successfully",
       data: notebook,
     });
   } catch (error) {
@@ -53,7 +53,7 @@ export const getNotebookById = async (req, res) => {
     if (!notebook) {
       return res.status(404).json({
         success: false,
-        message: "Notebook not found",
+        message: "Notebook quote not found",
       });
     }
 
@@ -64,7 +64,7 @@ export const getNotebookById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching notebook",
+      message: "Error fetching notebook quote",
     });
   }
 };
@@ -73,17 +73,49 @@ export const getNotebookById = async (req, res) => {
 
 export const deleteNotebook = async (req, res) => {
   try {
-    const notebook = await notebookService.deleteNotebook(req.params.id);
+    await notebookService.deleteNotebook(req.params.id);
 
     res.status(200).json({
       success: true,
-      message: "Notebook deleted successfully",
+      message: "Notebook quote deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting notebook quote",
+    });
+  }
+};
+
+/* Update Notebook */
+
+export const updateNotebook = async (req, res) => {
+  try {
+    const data = req.body;
+
+    if (req.files && req.files.length > 0) {
+      data.files = req.files.map((file) => file.path);
+    }
+
+    const notebook = await notebookService.updateNotebook(req.params.id, data);
+
+    if (!notebook) {
+      return res.status(404).json({
+        success: false,
+        message: "Notebook quote not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Notebook quote updated successfully",
       data: notebook,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error deleting notebook",
+      message: "Error updating notebook quote",
+      error: error.message,
     });
   }
 };
@@ -93,4 +125,5 @@ export default {
   getAllNotebooks,
   getNotebookById,
   deleteNotebook,
+  updateNotebook,
 };

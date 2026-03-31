@@ -177,6 +177,44 @@ bookletOptionSchema.statics.addCategory = async function (
   return options;
 };
 
+// Static method to update a category
+bookletOptionSchema.statics.updateCategory = async function (
+  categoryKey,
+  updates,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+
+  // Update fields if provided
+  if (updates.displayName) {
+    category.displayName = updates.displayName;
+  }
+  if (updates.fieldType) {
+    category.fieldType = updates.fieldType;
+  }
+  if (updates.placeholder !== undefined) {
+    category.placeholder = updates.placeholder;
+  }
+  if (updates.required !== undefined) {
+    category.required = updates.required;
+  }
+
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
 // Static method to add a subcategory under a category
 bookletOptionSchema.statics.addSubcategory = async function (
   categoryKey,

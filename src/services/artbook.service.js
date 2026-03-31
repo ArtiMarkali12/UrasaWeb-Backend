@@ -17,9 +17,17 @@ export const deleteArtbook = async (id) => {
   return await Artbook.findByIdAndDelete(id);
 };
 
+export const updateArtbook = async (id, data) => {
+  return await Artbook.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+};
+
 export default {
   createArtbook,
   getAllArtbooks,
   getArtbookById,
-  deleteArtbook
+  deleteArtbook,
+  updateArtbook,
 };

@@ -20,8 +20,18 @@ router.get("/", ledgerRegisterController.getAllLedgerRegisters);
 
 router.get("/options", ledgerRegisterOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get(
+  "/options/dropdown",
+  ledgerRegisterOptionsController.getDropdownOptions,
+);
+
 /* Category Management (Main Categories) */
 router.post("/category", ledgerRegisterOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  ledgerRegisterOptionsController.updateCategory,
+);
 router.delete("/category", ledgerRegisterOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -32,6 +42,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   ledgerRegisterOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  ledgerRegisterOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

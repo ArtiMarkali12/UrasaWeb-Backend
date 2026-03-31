@@ -12,6 +12,9 @@ router.get("/dropdown", bookletOptionsController.getDropdownOptions);
 // Add a new category
 router.post("/category", bookletOptionsController.addCategory);
 
+// Update a category
+router.put("/category/:categoryKey", bookletOptionsController.updateCategory);
+
 // Delete a category
 router.delete("/category", bookletOptionsController.deleteCategory);
 
@@ -19,6 +22,12 @@ router.delete("/category", bookletOptionsController.deleteCategory);
 router.post(
   "/category/:categoryKey/subcategory",
   bookletOptionsController.addSubcategory,
+);
+
+// Update a subcategory
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey",
+  bookletOptionsController.updateSubcategoryField,
 );
 
 // Delete a subcategory from a category

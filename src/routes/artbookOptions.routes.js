@@ -10,6 +10,7 @@ router.get("/", artbookOptionsController.getAllArtbookOptions);
 /* Category Management (Main Categories) */
 router.post("/category", artbookOptionsController.addCategory);
 router.delete("/category", artbookOptionsController.deleteCategory);
+router.put("/category/:categoryKey", artbookOptionsController.updateCategory);
 
 /* Subcategory Management */
 router.post(
@@ -19,6 +20,10 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   artbookOptionsController.deleteSubcategory,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  artbookOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

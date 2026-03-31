@@ -49,9 +49,10 @@ const validateBookletQuote = (req, res, next) => {
 
   // Phone is now optional - removed validation
 
-  // Validate orientation if provided
+  // Validate orientation if provided (must be either 'portrait' or 'landscape' when present)
   if (
     req.body.orientation &&
+    req.body.orientation !== "" &&
     !["portrait", "landscape"].includes(req.body.orientation)
   ) {
     return res.status(400).json({

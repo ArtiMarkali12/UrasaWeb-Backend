@@ -9,6 +9,9 @@ router.get("/", notebookOptionsController.getAllOptions);
 // Add a new category
 router.post("/category", notebookOptionsController.addCategory);
 
+// Update a category
+router.put("/category/:categoryKey", notebookOptionsController.updateCategory);
+
 // Delete a category
 router.delete("/category", notebookOptionsController.deleteCategory);
 
@@ -22,6 +25,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   notebookOptionsController.deleteSubcategory,
+);
+
+// Update subcategory field configuration
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  notebookOptionsController.updateSubcategoryField,
 );
 
 // Add an attribute to a subcategory

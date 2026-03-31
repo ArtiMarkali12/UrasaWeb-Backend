@@ -16,6 +16,9 @@ router.get("/", artbookController.getAllArtbooks);
 
 router.get("/options", artbookOptionsController.getAllArtbookOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", artbookOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", artbookOptionsController.addCategory);
 router.delete("/category", artbookOptionsController.deleteCategory);
@@ -28,6 +31,10 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   artbookOptionsController.deleteSubcategory,
+);
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  artbookOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
@@ -58,8 +65,9 @@ router.delete(
   artbookOptionsController.deleteCategoryAttribute,
 );
 
-/* Artbook by ID - Must be after /options */
 router.get("/:id", artbookController.getArtbookById);
+
+router.put("/:id", artbookController.updateArtbook);
 
 router.delete("/:id", artbookController.deleteArtbook);
 

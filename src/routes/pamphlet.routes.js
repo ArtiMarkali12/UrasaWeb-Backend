@@ -16,8 +16,12 @@ router.get("/", pamphletController.getAllPamphlets);
 
 router.get("/options", pamphletOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", pamphletOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", pamphletOptionsController.addCategory);
+router.put("/category/:categoryKey", pamphletOptionsController.updateCategory);
 router.delete("/category", pamphletOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -28,6 +32,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   pamphletOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  pamphletOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

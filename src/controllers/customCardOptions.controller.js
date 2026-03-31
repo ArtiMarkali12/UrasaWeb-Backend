@@ -17,9 +17,28 @@ export const getAllOptions = async (req, res) => {
   }
 };
 
+// Get options in hierarchical format for dropdowns (for frontend)
+export const getDropdownOptions = async (req, res) => {
+  try {
+    const options = await CustomCardOption.getDropdownOptions();
+
+    res.status(200).json({
+      success: true,
+      data: options,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching custom card dropdown options",
+      error: error.message,
+    });
+  }
+};
+
 export const addCategory = async (req, res) => {
   try {
-    const { categoryKey } = req.body;
+    const { categoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!categoryKey) {
       return res.status(400).json({
@@ -28,7 +47,13 @@ export const addCategory = async (req, res) => {
       });
     }
 
-    const options = await CustomCardOption.addCategory(categoryKey);
+    const options = await CustomCardOption.addCategory(
+      categoryKey,
+      displayName || categoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
+    );
 
     res.status(201).json({
       success: true,
@@ -43,10 +68,37 @@ export const addCategory = async (req, res) => {
   }
 };
 
+// Update category field configuration
+export const updateCategory = async (req, res) => {
+  try {
+    const { categoryKey } = req.params;
+    const { displayName, fieldType, placeholder, required } = req.body;
+
+    const options = await CustomCardOption.updateCategory(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Category "${categoryKey}" updated successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export const addSubcategory = async (req, res) => {
   try {
     const { categoryKey } = req.params;
-    const { subcategoryKey } = req.body;
+    const { subcategoryKey, displayName, fieldType, placeholder, required } =
+      req.body;
 
     if (!subcategoryKey) {
       return res.status(400).json({
@@ -58,11 +110,40 @@ export const addSubcategory = async (req, res) => {
     const options = await CustomCardOption.addSubcategory(
       categoryKey,
       subcategoryKey,
+      displayName || subcategoryKey,
+      fieldType || "select",
+      placeholder || "",
+      required || false,
     );
 
     res.status(201).json({
       success: true,
       message: `Subcategory "${subcategoryKey}" added to "${categoryKey}" successfully`,
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update subcategory field configuration
+export const updateSubcategoryField = async (req, res) => {
+  try {
+    const { categoryKey, subcategoryKey } = req.params;
+    const { fieldType, placeholder, required, displayName } = req.body;
+
+    const options = await CustomCardOption.updateSubcategoryField(
+      categoryKey,
+      subcategoryKey,
+      { fieldType, placeholder, required, displayName },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Subcategory "${subcategoryKey}" field configuration updated successfully`,
       data: options,
     });
   } catch (error) {
@@ -291,11 +372,115 @@ export const deleteCategoryAttribute = async (req, res) => {
   }
 };
 
+// Card Types Management Methods
+export const getAllCardTypes = async (req, res) => {
+  try {
+    const cardTypes = await CustomCardOption.getAllCardTypes();
+
+    res.status(200).json({
+      success: true,
+      data: cardTypes,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching card types",
+      error: error.message,
+    });
+  }
+};
+
+export const addCardType = async (req, res) => {
+  try {
+    const cardTypeData = req.body;
+
+    const options = await CustomCardOption.addCardType(cardTypeData);
+
+    res.status(201).json({
+      success: true,
+      message: "Card type added successfully",
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateCardType = async (req, res) => {
+  try {
+    const { index } = req.params;
+    const cardTypeData = req.body;
+
+    const options = await CustomCardOption.updateCardType(
+      parseInt(index),
+      cardTypeData,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Card type updated successfully",
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteCardType = async (req, res) => {
+  try {
+    const { index } = req.params;
+
+    const options = await CustomCardOption.deleteCardType(parseInt(index));
+
+    res.status(200).json({
+      success: true,
+      message: "Card type deleted successfully",
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const reorderCardTypes = async (req, res) => {
+  try {
+    const { fromIndex, toIndex } = req.body;
+
+    const options = await CustomCardOption.reorderCardTypes(
+      parseInt(fromIndex),
+      parseInt(toIndex),
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Card types reordered successfully",
+      data: options,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export default {
   getAllOptions,
+  getDropdownOptions,
   addCategory,
-  addSubcategory,
+  updateCategory,
   deleteCategory,
+  addSubcategory,
+  updateSubcategoryField,
   deleteSubcategory,
   addAttribute,
   updateAttribute,
@@ -303,4 +488,9 @@ export default {
   addCategoryAttribute,
   updateCategoryAttribute,
   deleteCategoryAttribute,
+  getAllCardTypes,
+  addCardType,
+  updateCardType,
+  deleteCardType,
+  reorderCardTypes,
 };

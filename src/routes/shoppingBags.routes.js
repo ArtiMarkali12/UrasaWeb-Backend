@@ -20,8 +20,18 @@ router.get("/", shoppingBagsController.getAllShoppingBags);
 
 router.get("/options", shoppingBagsOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get(
+  "/options/dropdown",
+  shoppingBagsOptionsController.getDropdownOptions,
+);
+
 /* Category Management (Main Categories) */
 router.post("/category", shoppingBagsOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  shoppingBagsOptionsController.updateCategory,
+);
 router.delete("/category", shoppingBagsOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -32,6 +42,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   shoppingBagsOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  shoppingBagsOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

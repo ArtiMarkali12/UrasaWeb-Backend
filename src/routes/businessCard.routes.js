@@ -20,8 +20,18 @@ router.get("/", businessCardController.getAllBusinessCards);
 
 router.get("/options", businessCardOptionsController.getAllBusinessCardOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get(
+  "/options/dropdown",
+  businessCardOptionsController.getDropdownOptions,
+);
+
 /* Category Management (Main Categories) */
 router.post("/category", businessCardOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  businessCardOptionsController.updateCategory,
+);
 router.delete("/category", businessCardOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -32,6 +42,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   businessCardOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  businessCardOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
@@ -64,6 +80,8 @@ router.delete(
 
 /* Business Card by ID - Must be after /options */
 router.get("/:id", businessCardController.getBusinessCardById);
+
+router.put("/:id", businessCardController.updateBusinessCard);
 
 router.delete("/:id", businessCardController.deleteBusinessCard);
 

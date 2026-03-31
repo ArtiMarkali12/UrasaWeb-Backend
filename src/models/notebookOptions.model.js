@@ -1,11 +1,36 @@
 import mongoose from "mongoose";
 
-// Schema for subcategories containing attributes
+// Schema for subcategories containing attributes with field type configuration
 const subcategorySchema = new mongoose.Schema(
   {
+    displayName: {
+      type: String,
+      default: "",
+    },
+    fieldType: {
+      type: String,
+      enum: [
+        "select",
+        "checkbox",
+        "boolean",
+        "number",
+        "text",
+        "textarea",
+        "radio",
+      ],
+      default: "select",
+    },
     attributes: {
       type: [String],
       default: [],
+    },
+    placeholder: {
+      type: String,
+      default: "",
+    },
+    required: {
+      type: Boolean,
+      default: false,
     },
   },
   { _id: false },
@@ -14,6 +39,31 @@ const subcategorySchema = new mongoose.Schema(
 // Schema for main categories containing subcategories and direct attributes
 const categorySchema = new mongoose.Schema(
   {
+    displayName: {
+      type: String,
+      default: "",
+    },
+    fieldType: {
+      type: String,
+      enum: [
+        "select",
+        "checkbox",
+        "boolean",
+        "number",
+        "text",
+        "textarea",
+        "radio",
+      ],
+      default: "select",
+    },
+    placeholder: {
+      type: String,
+      default: "",
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
     subcategories: {
       type: Map,
       of: subcategorySchema,
@@ -54,6 +104,10 @@ notebookOptionSchema.statics.getAllOptions = async function () {
   if (options.categories) {
     options.categories.forEach((categoryData, categoryKey) => {
       result[categoryKey] = {
+        displayName: categoryData.displayName || categoryKey,
+        fieldType: categoryData.fieldType || "select",
+        placeholder: categoryData.placeholder || "",
+        required: categoryData.required || false,
         attributes: categoryData.attributes || [],
         subcategories: {},
       };
@@ -61,6 +115,10 @@ notebookOptionSchema.statics.getAllOptions = async function () {
       if (categoryData.subcategories) {
         categoryData.subcategories.forEach((subcatData, subcatKey) => {
           result[categoryKey].subcategories[subcatKey] = {
+            displayName: subcatData.displayName || subcatKey,
+            fieldType: subcatData.fieldType || "select",
+            placeholder: subcatData.placeholder || "",
+            required: subcatData.required || false,
             attributes: subcatData.attributes || [],
           };
         });
@@ -72,12 +130,29 @@ notebookOptionSchema.statics.getAllOptions = async function () {
 };
 
 // Static method to add a new main category
-notebookOptionSchema.statics.addCategory = async function (categoryKey) {
+notebookOptionSchema.statics.addCategory = async function (
+  categoryKey,
+  displayName,
+  fieldType = "select",
+  placeholder = "",
+  required = false,
+) {
   let options = await this.findOne();
 
   if (!options) {
     options = await this.create({
-      categories: new Map([[categoryKey, { subcategories: new Map() }]]),
+      categories: new Map([
+        [
+          categoryKey,
+          {
+            displayName,
+            fieldType,
+            placeholder,
+            required,
+            subcategories: new Map(),
+          },
+        ],
+      ]),
     });
   } else {
     if (!options.categories) {
@@ -89,6 +164,10 @@ notebookOptionSchema.statics.addCategory = async function (categoryKey) {
     }
 
     options.categories.set(categoryKey, {
+      displayName,
+      fieldType,
+      placeholder,
+      required,
       subcategories: new Map(),
     });
     options.markModified("categories");
@@ -98,10 +177,52 @@ notebookOptionSchema.statics.addCategory = async function (categoryKey) {
   return options;
 };
 
+// Static method to update a category
+notebookOptionSchema.statics.updateCategory = async function (
+  categoryKey,
+  updates,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+
+  // Update fields if provided
+  if (updates.displayName) {
+    category.displayName = updates.displayName;
+  }
+  if (updates.fieldType) {
+    category.fieldType = updates.fieldType;
+  }
+  if (updates.placeholder !== undefined) {
+    category.placeholder = updates.placeholder;
+  }
+  if (updates.required !== undefined) {
+    category.required = updates.required;
+  }
+
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
 // Static method to add a subcategory under a category
 notebookOptionSchema.statics.addSubcategory = async function (
   categoryKey,
   subcategoryKey,
+  displayName,
+  fieldType = "select",
+  placeholder = "",
+  required = false,
 ) {
   let options = await this.findOne();
 
@@ -124,7 +245,58 @@ notebookOptionSchema.statics.addSubcategory = async function (
     );
   }
 
-  category.subcategories.set(subcategoryKey, { attributes: [] });
+  category.subcategories.set(subcategoryKey, {
+    displayName: displayName || subcategoryKey,
+    fieldType,
+    placeholder,
+    required,
+    attributes: [],
+  });
+  options.categories.set(categoryKey, category);
+  options.markModified("categories");
+  await options.save();
+
+  return options;
+};
+
+// Static method to update subcategory field configuration
+notebookOptionSchema.statics.updateSubcategoryField = async function (
+  categoryKey,
+  subcategoryKey,
+  updates,
+) {
+  let options = await this.findOne();
+
+  if (!options) {
+    throw new Error("Options not found");
+  }
+
+  if (!options.categories || !options.categories.has(categoryKey)) {
+    throw new Error(`Category "${categoryKey}" does not exist`);
+  }
+
+  const category = options.categories.get(categoryKey);
+  if (!category.subcategories || !category.subcategories.has(subcategoryKey)) {
+    throw new Error(`Subcategory "${subcategoryKey}" does not exist`);
+  }
+
+  const subcategory = category.subcategories.get(subcategoryKey);
+
+  // Update fields if provided
+  if (updates.displayName) {
+    subcategory.displayName = updates.displayName;
+  }
+  if (updates.fieldType) {
+    subcategory.fieldType = updates.fieldType;
+  }
+  if (updates.placeholder !== undefined) {
+    subcategory.placeholder = updates.placeholder;
+  }
+  if (updates.required !== undefined) {
+    subcategory.required = updates.required;
+  }
+
+  category.subcategories.set(subcategoryKey, subcategory);
   options.categories.set(categoryKey, category);
   options.markModified("categories");
   await options.save();

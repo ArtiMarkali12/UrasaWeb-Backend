@@ -20,8 +20,15 @@ router.get("/", letterheadController.getAllLetterheads);
 
 router.get("/options", letterheadOptionsController.getAllOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", letterheadOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", letterheadOptionsController.addCategory);
+router.put(
+  "/category/:categoryKey",
+  letterheadOptionsController.updateCategory,
+);
 router.delete("/category", letterheadOptionsController.deleteCategory);
 
 /* Subcategory Management */
@@ -32,6 +39,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   letterheadOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  letterheadOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */

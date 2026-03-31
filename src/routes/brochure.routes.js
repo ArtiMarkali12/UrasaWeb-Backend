@@ -16,6 +16,9 @@ router.get("/", brochureController.getAllBrochures);
 
 router.get("/options", brochureOptionsController.getAllBrochureOptions);
 
+// Get options in hierarchical format for dropdowns (for frontend)
+router.get("/options/dropdown", brochureOptionsController.getDropdownOptions);
+
 /* Category Management (Main Categories) */
 router.post("/category", brochureOptionsController.addCategory);
 router.delete("/category", brochureOptionsController.deleteCategory);
@@ -28,6 +31,12 @@ router.post(
 router.delete(
   "/category/:categoryKey/subcategory/:subcategoryKey",
   brochureOptionsController.deleteSubcategory,
+);
+
+/* Update Subcategory Field Configuration */
+router.put(
+  "/category/:categoryKey/subcategory/:subcategoryKey/field",
+  brochureOptionsController.updateSubcategoryField,
 );
 
 /* Attribute Management */
@@ -58,9 +67,9 @@ router.delete(
   brochureOptionsController.deleteCategoryAttribute,
 );
 
-/* ---------------- Brochure ID-based APIs (must be last) ---------------- */
-
 router.get("/:id", brochureController.getBrochureById);
+
+router.put("/:id", brochureController.updateBrochure);
 
 router.delete("/:id", brochureController.deleteBrochure);
 

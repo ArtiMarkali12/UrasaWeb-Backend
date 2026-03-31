@@ -17,9 +17,17 @@ export const deleteBrochure = async (id) => {
   return await Brochure.findByIdAndDelete(id);
 };
 
+export const updateBrochure = async (id, data) => {
+  return await Brochure.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+};
+
 export default {
   createBrochure,
   getAllBrochures,
   getBrochureById,
   deleteBrochure,
+  updateBrochure,
 };
