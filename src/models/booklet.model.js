@@ -17,6 +17,25 @@ const bookletSchema = new mongoose.Schema(
       enum: ["portrait", "landscape"],
     },
 
+    // Additional size specifications from frontend carousel
+    sizeSpecifications: {
+      selectedSize: {
+        type: String,
+      },
+      // Width in inches (for both preset and custom sizes)
+      widthInches: {
+        type: String,
+      },
+      // Height in inches (for both preset and custom sizes)
+      heightInches: {
+        type: String,
+      },
+      // Additional custom size info
+      additionalInfo: {
+        type: String,
+      },
+    },
+
     bindingStyle: {
       bindingType: {
         type: String,
