@@ -1,5 +1,5 @@
 const validateBookletQuote = (req, res, next) => {
-  const { quantity, bookSize, customerDetails } = req.body;
+  const { quantity, bookSize, customerDetails, orderType } = req.body;
 
   // Validate required fields
   if (!quantity) {
@@ -13,6 +13,28 @@ const validateBookletQuote = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Book size is required",
+    });
+  }
+
+  // Validate order type
+  const validOrderTypes = [
+    "Saddle Booklet",
+    "Coffee Table Book",
+    "Perfect Bound Booklet",
+    "Spiral/Comb Coil Booklet",
+    "Hard Cover Booklet",
+  ];
+  if (!orderType) {
+    return res.status(400).json({
+      success: false,
+      message: "Order type is required",
+    });
+  }
+  if (!validOrderTypes.includes(orderType)) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid order type. Must be one of: Saddle Booklet, Coffee Table Book, Perfect Bound Booklet, Spiral/Comb Coil Booklet, Hard Cover Booklet",
     });
   }
 

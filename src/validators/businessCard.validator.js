@@ -1,5 +1,6 @@
 const validateBusinessCard = (req, res, next) => {
-  const { basicsAndDimensions, paperAndMaterial, customerDetails } = req.body;
+  const { basicsAndDimensions, paperAndMaterial, customerDetails, orderType } =
+    req.body;
 
   // Validate basics and dimensions
   if (!basicsAndDimensions) {
@@ -48,6 +49,22 @@ const validateBusinessCard = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Orientation must be either 'portrait' or 'landscape'",
+    });
+  }
+
+  // Validate order type
+  const validOrderTypes = ["Standard", "Rush", "Custom", "Bulk"];
+  if (!orderType) {
+    return res.status(400).json({
+      success: false,
+      message: "Order type is required",
+    });
+  }
+  if (!validOrderTypes.includes(orderType)) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid order type. Must be one of: Standard, Rush, Custom, Bulk",
     });
   }
 

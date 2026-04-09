@@ -17,6 +17,18 @@ const bookletSchema = new mongoose.Schema(
       enum: ["portrait", "landscape"],
     },
 
+    orderType: {
+      type: String,
+      enum: [
+        "Saddle Booklet",
+        "Coffee Table Book",
+        "Perfect Bound Booklet",
+        "Spiral/Comb Coil Booklet",
+        "Hard Cover Booklet",
+      ],
+      required: true,
+    },
+
     // Additional size specifications from frontend carousel
     sizeSpecifications: {
       selectedSize: {

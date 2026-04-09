@@ -74,6 +74,12 @@ const businessCardSchema = new mongoose.Schema(
       },
     },
 
+    orderType: {
+      type: String,
+      enum: ["Standard", "Rush", "Custom", "Bulk"],
+      required: true,
+    },
+
     customerDetails: {
       name: {
         type: String,
