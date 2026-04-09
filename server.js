@@ -37,6 +37,7 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "https://urasaweb-frontend.onrender.com",
       "https://urasaweb-admin.onrender.com",
       "http://localhost:5173",
       "http://localhost:5174",
